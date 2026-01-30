@@ -1,88 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Resume</title>
+    <title>Thanh Tran Xuan - Portfolio</title>
+    <link rel="stylesheet" href="./assets/css/style.css">
 </head>
+
 <body>
-    <div class="name">
-        <h1>Thanh Tran Xuan</h1>
-        <img src="./assets/images/id.jpg" width=500 height=500 alt="Profile picture" />
-    </div>
-    
-    <div class="prolouge">
-        <h2>Prolouge</h2>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit eaque placeat ea nam iste a harum tempora ipsa temporibus sit hic sunt nihil eligendi deleniti id laudantium, eos vel. Sequi.</p>
-    </div>
-    <hr />
 
-    <div class="education">
-        <h2>Education</h2>
-        <ul>
-            <li>2018 - 2022: Bachelor of Computer Science, University of Technology</li>
-            <li>2022 - Present: Master of Computer Science, University of Technology</li>
-        </ul>
-    </div>
-    <hr />
+    <!-- Hero Section -->
+    <header class="hero animate-entrance">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h1>Trần Xuân Thành</h1>
+                <p class="role">Aspiring Full-Stack Developer</p>
+                <p>Passionate about Software Engineering, Computer Science, and AI. Equipped with strong foundations in
+                    C++,
+                    Python, and JavaScript, with hands-on experience in modern frameworks like React and Node.js.</p>
+            </div>
+            <div class="profile-img-container">
+                <img src="./assets/images/id.jpg" alt="Thanh Tran Xuan" class="profile-img" />
+            </div>
+        </div>
+    </header>
 
-    <div class="experience">
-        <h2>Experience</h2>
-        <ul>
-            <li>
-                <h3>Software Developer Intern, Tech Company</h3>
-                <p>2021 - 2022</p>
-                <ul>
-                    <li>Developed a web application using React and Node.js</li>
-                    <li>Collaborated with a team of developers to implement new features</li>                    
-                    <li>Participated in code reviews and provided feedback to peers</li>
-                </ul>
-            </li>
-            <li>
-               <h3>Full Stack Developer, Tech Company</h3>
-               <p>2022 - Present</p>
-               <ul>
-                    <li>Developed and maintained web applications using React and Node.js</li>
-                    <li>Collaborated with a team of developers to implement new features</li>
-                    <li>Participated in code reviews and provided feedback to peers</li>
-               </ul>
-            </li>
-        </ul>
-    </div>
-    <hr />
+    <!-- Experience & Education Grid -->
+    <div class="container">
+        <div class="grid grid-2">
+            <!-- Education -->
+            <section id="education">
+                <h2 class="section-title">Education</h2>
+                <div class="timeline-item">
+                    <h3>Posts and Telecommunications Institute of Technology (PTIT)</h3>
+                    <p class="card-meta">2023 - Present | GPA: 3.64/4</p>
+                    <p>Information Technology - High Quality Program</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>Foreign Language Specialized School (CNN)</h3>
+                    <p class="card-meta">2020 - 2023</p>
+                    <p>High School Diploma</p>
+                </div>
+            </section>
 
-    <div class="skills">
-        <h2>Skills</h2>
-        <ul>
-            <li>Programming Languages: JavaScript, Python, Java</li>
-            <li>Web Development: HTML, CSS, React, Node.js</li>
-            <li>Database Management: MySQL, MongoDB</li>
-            <li>Machine Learning: YouTube</li>
-            <li>Data Analysis: Python, Pandas, NumPy</li>
-            <li>Version Control: Git</li>
-        </ul>
+            <!-- Experience/Activities -->
+            <section id="experience">
+                <h2 class="section-title">Activities</h2>
+                <div class="timeline-item">
+                    <h3>Multimedia Club PTIT</h3>
+                    <p class="card-meta">2023 - 2024 | Media Team</p>
+                    <p>Responsible for photography, video editing, and designing media publications. Supported events
+                        like FOSSASIA Summit 2024.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>Red Music Society</h3>
+                    <p class="card-meta">2021 - 2023 | Vice Head of Communication</p>
+                    <p>Organized "The Way We Walk" Revolutionary Music Night with nearly 500 attendees. Directed media
+                        strategy and team training.</p>
+                </div>
+            </section>
+        </div>
     </div>
-    <hr />
 
-    <div class="awards">
-        <h2>Awards</h2>
-        <ul>
-            <li>2021: Best Student Award, University of Technology</li>
-            <li>2022: Best Project Award, Tech Company</li>
-        </ul>
-    </div>
-    <hr />
+    <!-- Skills Section -->
+    <section id="skills" class="container">
+        <h2 class="section-title">Skills & Tech Stack</h2>
+        <div class="skills-list">
+            <span class="skill-tag">JavaScript / TypeScript</span>
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">C++ (DSA)</span>
+            <span class="skill-tag">Java</span>
+            <span class="skill-tag">React.js</span>
+            <span class="skill-tag">Node.js</span>
+            <span class="skill-tag">Flask</span>
+            <span class="skill-tag">FastAPI</span>
+            <span class="skill-tag">MongoDB</span>
+            <span class="skill-tag">Git / GitHub</span>
+            <span class="skill-tag">IELTS 7.0</span>
+        </div>
+    </section>
 
-    <div class="links">
-        <h2>Learn More</h2>
-        <ul>
-            <li><a href="https://www.youtube.com">Most Favorite Website</a></li>
-            <li><a href="contact.html">Contact Me</a></li>
-        </ul>
-    </div>
-    
+    <!-- Projects Section -->
+    <section id="projects" class="container">
+        <h2 class="section-title">Featured Projects</h2>
+        <div class="grid grid-2">
+            <div class="card">
+                <h3>Stress Level Detection App</h3>
+                <p class="card-meta">Health Tech Web App</p>
+                <p>A web application to evaluate stress levels and provide health advice using Machine Learning models.
+                    Integrated with LLM for personalized advice.</p>
+                <div class="tech-stack">
+                    <span class="tech-tag">Flask</span>
+                    <span class="tech-tag">FastAPI</span>
+                    <span class="tech-tag">Bootstrap</span>
+                    <span class="tech-tag">MongoDB</span>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Quite A Todo App</h3>
+                <p class="card-meta">Productivity Tool</p>
+                <p>A lightweight todo app supporting Kanban boards, Calendar view, and "Do Now" focus mode. Features
+                    local storage persistence.</p>
+                <div class="tech-stack">
+                    <span class="tech-tag">React</span>
+                    <span class="tech-tag">Vite</span>
+                    <span class="tech-tag">TypeScript</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Awards Section -->
+    <section id="awards" class="container">
+        <h2 class="section-title">Honors & Awards</h2>
+        <div class="card">
+            <h3>First Prize - "AI FOR LIFE" 2025</h3>
+            <p>Topic: "Con Duong Tri Thuc" - A solution to accompany students in learning and career orientation.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
     <footer>
-        <p>Copyright &copy; 2025 Thanh Tran Xuan. Black Meets Wukong.</p>
+        <div class="container">
+            <p>&copy; 2025 Trần Xuân Thành. Connect with me.</p>
+            <div style="margin-top: 1rem;">
+                <a href="contact.html" style="color: white; text-decoration: underline;">Contact Me</a>
+            </div>
+        </div>
     </footer>
+
 </body>
+
 </html>
