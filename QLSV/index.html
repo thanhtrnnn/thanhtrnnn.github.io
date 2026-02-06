@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARCHIVE_CORE // STUDENT_DATA</title>
+
+    <!-- Typography: JetBrains Mono for that code/data feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.1.0/fonts/remixicon.css" rel="stylesheet"/>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="layout-grid">
+        <!-- Sidebar / Control Panel -->
+        <aside class="control-panel">
+            <div class="brand">
+                <div class="brand-icon"><i class="ri-hard-drive-2-line"></i></div>
+                <div class="brand-text">
+                    <h1>ARCHIVE_CORE</h1>
+                    <span>V.2.0.4 // ACADEMIC</span>
+                </div>
+            </div>
+
+            <nav class="actions">
+                <div class="action-group">
+                    <label class="action-label">DATA INGESTION</label>
+                    <button id="btn-add-manual" class="cyber-btn">
+                        <i class="ri-add-line"></i> MANUAL ENTRY
+                    </button>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="file-input" accept=".csv, .xlsx, .xls" hidden>
+                        <button id="btn-import" class="cyber-btn secondary">
+                            <i class="ri-file-excel-2-line"></i> IMPORT DATA
+                        </button>
+                     </div>
+                    <label id="import-status" class="import-status">Expects:<br/> ID | Name | DOB | Class | GPA</label>
+                </div>
+
+                <div class="action-group">
+                    <label class="action-label">SYSTEM STATUS</label>
+                    <div class="stat-box">
+                        <span class="stat-label">TOTAL RECORDS</span>
+                        <span class="stat-value" id="total-students">000</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">AVG GPA</span>
+                        <span class="stat-value" id="avg-gpa">0.0</span>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="decor-lines"></div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="data-viewport">
+            <header class="viewport-header">
+                <div class="breadcrumbs">ROOT / STUDENTS / ACTIVE_LIST</div>
+                <div class="search-bar">
+                    <i class="ri-search-line"></i>
+                    <input type="text" id="search-input" placeholder="SEARCH_QUERY...">
+                </div>
+            </header>
+
+            <div class="table-container">
+                <table id="student-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="id">ID_CODE <i class="ri-arrow-up-down-fill"></i></th>
+                            <th data-sort="name">FULL_NAME <i class="ri-arrow-up-down-fill"></i></th>
+                            <th data-sort="dob">DOB_DATE <i class="ri-arrow-up-down-fill"></i></th>
+                            <th data-sort="class">CLASS_REF <i class="ri-arrow-up-down-fill"></i></th>
+                            <th data-sort="gpa">GPA_VAL <i class="ri-arrow-up-down-fill"></i></th>
+                            <th class="actions-col">OP_CODES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-list-body">
+                        <!-- Data injected here -->
+                    </tbody>
+                </table>
+                <div id="empty-state" class="empty-state">
+                    <i class="ri-database-2-line"></i>
+                    <p>NO_DATA_FOUND // INITIATE_IMPORT</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit/Add Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="cyber-modal">
+            <header class="modal-header">
+                <h2 id="modal-title">NEW_ENTRY //</h2>
+                <button id="btn-close-modal" class="close-btn"><i class="ri-close-line"></i></button>
+            </header>
+            <form id="student-form">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>STUDENT_ID</label>
+                        <input type="text" id="inp-id" required placeholder="Ex: SV001">
+                    </div>
+                    <div class="input-group">
+                        <label>FULL_NAME</label>
+                        <input type="text" id="inp-name" required placeholder="Ex: Nguyen Van A">
+                    </div>
+                    <div class="input-group">
+                        <label>DATE_OF_BIRTH</label>
+                        <input type="date" id="inp-dob" required>
+                    </div>
+                    <div class="input-group">
+                        <label>CLASS_REF</label>
+                        <input type="text" id="inp-class" required placeholder="Ex: D21CQCN01">
+                    </div>
+                    <div class="input-group">
+                        <label>GPA_SCORE</label>
+                        <input type="number" id="inp-gpa" min="0" max="4.0" step="0.01" required placeholder="0.0 - 4.0">
+                    </div>
+                </div>
+                <footer class="modal-footer">
+                    <button type="submit" class="cyber-btn primary">EXECUTE_SAVE</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+
+    <!-- SheetJS for Excel processing -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
