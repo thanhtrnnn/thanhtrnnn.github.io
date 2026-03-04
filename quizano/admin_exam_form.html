@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chỉnh sửa Kỳ thi - Quản trị Quizano</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .question-editor-card {
+            border: 1px solid #ced4da;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 4px;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="header">
+        <div class="nav-brand"><b>Quizano</b> <span class="text-muted" style="font-size: 0.8em;">Quản trị</span></div>
+        <div class="nav-links">
+            <a href="admin_dashboard.html" class="nav-active">Quản lý</a>
+            <a href="admin_stats.html">Thống kê</a>
+            <a href="admin_student_results.html">Kết quả SV</a>
+        </div>
+        <div class="nav-user">
+            <a href="#" onclick="logout()">Đăng xuất</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 90%; width: 90%;">
+        <h3 id="formTitle">TẠO KỲ THI MỚI</h3>
+        <hr>
+
+        <form id="examDataForm" onsubmit="event.preventDefault(); saveExamData();">
+            <div class="flex-container">
+                <div class="flex-child form-group">
+                    <label>Tên kỳ thi:</label>
+                    <input type="text" id="exTitle" required placeholder="Nhập tên kỳ thi...">
+                </div>
+                <div class="flex-child form-group">
+                    <label>Trạng thái:</label>
+                    <select id="exStatus" style="height: 38px;">
+                        <option value="active">Đang mở (Active)</option>
+                        <option value="inactive">Đã đóng (Inactive)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Mô tả kỳ thi:</label>
+                <textarea id="exDesc" rows="3" placeholder="Nhập thông tin mô tả..."></textarea>
+            </div>
+
+            <div class="flex-container">
+                <div class="flex-child form-group">
+                    <label>Loại kỳ thi:</label>
+                    <select id="exType" onchange="toggleScheduleFields()" style="height: 38px;">
+                        <option value="free">Luyện tập (Tự do về thời gian)</option>
+                        <option value="scheduled">Cố định (Có thời gian bắt đầu và kết thúc)</option>
+                    </select>
+                </div>
+                <div class="flex-child form-group">
+                    <label>Thời gian làm bài (phút):</label>
+                    <input type="number" id="exDuration" required min="1" value="15">
+                </div>
+            </div>
+
+            <div class="flex-container">
+                <div class="flex-child form-group" id="schedStartRow" style="display:none;">
+                    <label>Thời gian mở bài:</label>
+                    <input type="datetime-local" id="exStart">
+                </div>
+                <div class="flex-child form-group" id="schedEndRow" style="display:none;">
+                    <label>Thời gian đóng bài:</label>
+                    <input type="datetime-local" id="exEnd">
+                </div>
+            </div>
+
+            <fieldset style="background-color: #f8f9fa;">
+                <legend>Danh sách Câu hỏi</legend>
+                <div class="mb-3" style="border: 1px dashed #ced4da; padding: 15px; background-color: #ffffff;">
+                    <label class="font-weight-bold d-block mb-2">Nhập câu hỏi từ file Excel:</label>
+                    <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="mb-2">
+                    <button type="button" class="btn btn-outline" onclick="importExcel()">Tải lên file</button>
+                    <p class="text-muted mt-2 mb-0" style="font-size: 0.9em;">
+                        <i>Định dạng cột bắt buộc (dòng 1): <b>Question | OptionA | OptionB | OptionC | OptionD |
+                                CorrectOption</b> (Nhập A, B, C, D) <b>| Explanation</b></i>
+                    </p>
+                </div>
+
+                <div class="text-right mb-3">
+                    <button type="button" onclick="addEmptyQuestionBound()" class="btn btn-primary">+ Thêm mới câu
+                        hỏi</button>
+                </div>
+
+                <div id="questionsEditorList">
+                    <!-- Javascript rendering -->
+                </div>
+            </fieldset>
+
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-success" style="font-size: 1.1em; padding: 12px 30px;">Lưu thông tin</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="js/admin_exam_form.js"></script>
+</body>
+
+</html>

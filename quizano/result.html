@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kết quả thi - Quizano</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <nav class="header header-student">
+        <div class="nav-brand"><b>Quizano</b></div>
+        <div class="nav-links">
+            <a href="student_dashboard.html">Danh sách kỳ thi</a>
+            <a href="result.html" class="nav-active">Kết quả cá nhân</a>
+        </div>
+        <div class="nav-user">
+            <a href="#" onclick="logout()">Đăng xuất</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h3 class="text-center">KẾT QUẢ BÀI THI</h3>
+        <hr>
+
+        <table class="mb-3">
+            <tr>
+                <td style="width: 25%;"><b>Tên kỳ thi:</b></td>
+                <td id="resExamTitle">...</td>
+            </tr>
+            <tr>
+                <td><b>Tên sinh viên:</b></td>
+                <td id="resStudentName">...</td>
+            </tr>
+            <tr>
+                <td><b>Thời gian làm bài:</b></td>
+                <td id="resTimeInfo">...</td>
+            </tr>
+            <tr>
+                <td><b>Số câu đúng:</b></td>
+                <td>
+                    <span class="text-success font-weight-bold" id="resCorrectCount">0</span> / <span
+                        class="font-weight-bold" id="resTotalCount">0</span>
+                </td>
+            </tr>
+            <tr>
+                <td><b>Điểm số:</b></td>
+                <td><span class="text-danger font-weight-bold" style="font-size: 1.2em;" id="resScore">0.00</span> /
+                    10.00</td>
+            </tr>
+        </table>
+
+        <h4 class="text-center mt-3">CHI TIẾT ĐÁP ÁN</h4>
+        <hr>
+
+        <div id="detailsWrapper">
+            <!-- Javascript rendering -->
+        </div>
+
+        <div class="text-center mt-3">
+            <button onclick="window.location.href='student_dashboard.html'" class="btn btn-primary">Trở về Danh
+                sách</button>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/result.js"></script>
+</body>
+
+</html>

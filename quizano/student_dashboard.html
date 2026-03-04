@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách Kỳ thi - Quizano</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <nav class="header header-student">
+        <div class="nav-brand"><b>Quizano</b></div>
+        <div class="nav-links">
+            <a href="student_dashboard.html" class="nav-active">Danh sách kỳ thi</a>
+            <a href="result.html">Kết quả cá nhân</a>
+        </div>
+        <div class="nav-user">
+            <span>Xin chào, <b id="userNameDisplay">Sinh viên</b></span>
+            <a href="#" onclick="logout()">Đăng xuất</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h3 class="text-center">Danh sách kỳ thi</h3>
+
+        <fieldset>
+            <legend>Tìm kiếm & Lọc</legend>
+            <form id="filterForm" onsubmit="event.preventDefault(); renderExamList();"
+                class="flex-container align-items-center">
+                <div class="flex-child form-group" style="margin-bottom: 0;">
+                    <label>Tên kỳ thi:</label>
+                    <input type="text" id="searchInput" placeholder="Nhập tên kỳ thi...">
+                </div>
+                <div class="flex-child form-group" style="margin-bottom: 0;">
+                    <label>Loại kỳ thi:</label>
+                    <select id="typeFilter">
+                        <option value="all">-- Tất cả --</option>
+                        <option value="free">Luyện tập (Tự do)</option>
+                        <option value="scheduled">Có thời gian bắt buộc</option>
+                    </select>
+                </div>
+                <div style="padding-top: 20px;">
+                    <button type="submit" class="btn btn-primary">Lọc danh sách</button>
+                </div>
+            </form>
+        </fieldset>
+
+        <table id="examTable">
+            <thead>
+                <tr>
+                    <th class="text-center">STT</th>
+                    <th>Tên kỳ thi</th>
+                    <th>Mô tả</th>
+                    <th class="text-center">Loại hình</th>
+                    <th>Thời lượng</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="examListBody">
+                <!-- Javascript rendering -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>

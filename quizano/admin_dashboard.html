@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quản trị - Quizano</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="header">
+        <div class="nav-brand"><b>Quizano</b> <span class="text-muted" style="font-size: 0.8em;">Quản trị</span></div>
+        <div class="nav-links">
+            <a href="admin_dashboard.html" class="nav-active">Quản lý</a>
+            <a href="admin_stats.html">Thống kê</a>
+            <a href="admin_student_results.html">Kết quả SV</a>
+        </div>
+        <div class="nav-user">
+            <span>Chào, <b id="adminNameDisplay">Admin</b></span>
+            <a href="#" onclick="logout()">Đăng xuất</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 95%; width: 95%;">
+        <div class="flex-container">
+            <div class="flex-child">
+                <fieldset>
+                    <legend>Quản lý Kỳ thi</legend>
+                    <div class="mb-3">
+                        <button onclick="window.location.href='admin_exam_form.html'" class="btn btn-success">+ Tạo kỳ
+                            thi mới</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tên kỳ thi</th>
+                                <th class="text-center">Loại</th>
+                                <th class="text-center">Trạng thái</th>
+                                <th class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminExamList">
+                            <!-- JS -->
+                        </tbody>
+                    </table>
+                </fieldset>
+            </div>
+
+            <div class="flex-child">
+                <fieldset>
+                    <legend>Quản lý Sinh viên</legend>
+
+                    <div
+                        style="background-color: #f8f9fa; border: 1px dotted #ccc; padding: 15px; margin-bottom: 20px;">
+                        <b>Thêm sinh viên mới:</b>
+                        <form onsubmit="event.preventDefault(); addStudent();"
+                            class="mt-2 flex-container align-items-center">
+                            <input type="text" id="newSvName" placeholder="Họ và tên" required class="flex-child">
+                            <input type="text" id="newSvUser" placeholder="Mã/Tên ĐN" required class="flex-child">
+                            <input type="password" id="newSvPass" placeholder="Mật khẩu" required class="flex-child">
+                            <button type="submit" class="btn btn-primary">Thêm</button>
+                        </form>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mã số/Tài khoản</th>
+                                <th>Họ và Tên</th>
+                                <th class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminStudentList">
+                            <!-- JS -->
+                        </tbody>
+                    </table>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/admin_dashboard.js"></script>
+</body>
+
+</html>

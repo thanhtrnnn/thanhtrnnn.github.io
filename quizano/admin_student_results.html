@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tra cứu Kết quả SV - Quản trị Quizano</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .journey-box {
+            border: 1px solid #28a745;
+            padding: 20px;
+            border-radius: 4px;
+            background-color: #ffffff;
+        }
+
+        .detail-box {
+            border-top: 2px dashed #dee2e6;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .row-hover:hover {
+            background-color: #e2e6ea;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="header">
+        <div class="nav-brand"><b>Quizano</b> <span class="text-muted" style="font-size: 0.8em;">Quản trị</span></div>
+        <div class="nav-links">
+            <a href="admin_dashboard.html">Quản lý</a>
+            <a href="admin_stats.html">Thống kê</a>
+            <a href="admin_student_results.html" class="nav-active">Kết quả SV</a>
+        </div>
+        <div class="nav-user">
+            <a href="#" onclick="logout()">Đăng xuất</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 95%; width: 95%;">
+        <h3>HỒ SƠ BÀI LÀM CỦA SINH VIÊN</h3>
+        <hr>
+
+        <fieldset style="background-color: #f8f9fa;">
+            <legend>Công cụ tìm kiếm</legend>
+            <form id="searchForm" onsubmit="event.preventDefault(); renderStudentList();"
+                class="flex-container align-items-center mb-0">
+                <div class="form-group mb-0 flex-child">
+                    <label>Tìm kiếm theo tên tài khoản / mã số:</label>
+                    <input type="text" id="searchInput" placeholder="Nhập từ khóa xác định sinh viên...">
+                </div>
+                <div class="form-group mb-0" style="padding-top: 25px;">
+                    <button type="submit" class="btn btn-primary">Tìm kiếm dữ liệu</button>
+                </div>
+            </form>
+        </fieldset>
+
+        <div class="flex-container mt-3">
+            <div style="flex: 1;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kết quả tìm kiếm</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentListTbody">
+                        <tr>
+                            <td class="text-center text-muted"><i>Chưa có dữ liệu tìm kiếm</i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="flex: 2; padding-left: 20px;">
+                <div id="studentJourneyArea" class="d-none journey-box">
+                    <h4>Lịch sử tham gia thi của sinh viên: <span id="targetSvName"
+                            class="text-primary font-weight-bold"></span></h4>
+                    <button type="button" onclick="printReport()" class="btn btn-secondary mb-3">In báo cáo
+                        (PDF)</button>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tên kỳ thi</th>
+                                <th>Thời gian nộp bài</th>
+                                <th class="text-center">Số điểm / Câu đúng</th>
+                                <th class="text-center">Đánh giá</th>
+                                <th class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="journeyTbody">
+                            <!-- Javascript rendering -->
+                        </tbody>
+                    </table>
+
+                    <div id="examDetailBox" class="d-none detail-box">
+                        <h4>Chi tiết lựa chọn trong quá trình làm bài: <span id="detailExamName"
+                                class="text-warning font-weight-bold"></span></h4>
+                        <div id="detailPaperArea">
+                            <!-- Javascript rendering -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/admin_student_results.js"></script>
+</body>
+
+</html>

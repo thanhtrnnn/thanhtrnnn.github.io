@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập & Đăng ký - Quizano</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="container text-center">
+        <h2>Hệ thống thi trắc nghiệm Quizano</h2>
+        <hr>
+        <div class="flex-container">
+            <div class="flex-child">
+                <fieldset>
+                    <legend>Đăng nhập sinh viên</legend>
+                    <form id="loginForm" onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label for="loginUsername">Tên đăng nhập:</label>
+                            <input type="text" id="loginUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Mật khẩu:</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <p class="text-danger" id="loginErrorMsg"></p>
+                        <button type="submit" class="btn btn-primary">Đăng nhập</button>
+                    </form>
+                </fieldset>
+            </div>
+
+            <div class="flex-child">
+                <fieldset>
+                    <legend>Đăng ký tài khoản</legend>
+                    <form id="registerForm" onsubmit="handleRegister(event)">
+                        <div class="form-group">
+                            <label for="regFullName">Họ và tên:</label>
+                            <input type="text" id="regFullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regUsername">Tên đăng nhập:</label>
+                            <input type="text" id="regUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regEmail">Email:</label>
+                            <input type="email" id="regEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regPassword">Mật khẩu:</label>
+                            <input type="password" id="regPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regConfirmPassword">Xác nhận mật khẩu:</label>
+                            <input type="password" id="regConfirmPassword" required>
+                        </div>
+                        <p class="text-danger" id="registerErrorMsg"></p>
+                        <p class="text-success" id="registerSuccessMsg"></p>
+                        <button type="submit" class="btn btn-success">Đăng ký</button>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
+
+        <p><a href="admin.html">Dành cho Quản trị viên</a></p>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+
+</html>
