@@ -37,23 +37,45 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+          cache-dependency-path: exam-diary/package-lock.json
           
       - name: Install dependencies
-        run: npm install
+        run: |
+          cd exam-diary
+          npm install
         
-      - name: Build
-        run: npm run build
+      - name: Build exam-diary
+        run: |
+          cd exam-diary
+          npm run build
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           
+      - name: Prepare staging directory
+        run: |
+          mkdir staging
+          # Copy root static files (index, styling, CV, etc.)
+          cp index.html staging/
+          cp style.css staging/
+          cp script.js staging/ 2>/dev/null || true
+          cp -r assets staging/ 2>/dev/null || true
+          cp -r QLSV staging/ 2>/dev/null || true
+          cp -r quizano staging/ 2>/dev/null || true
+          cp contact.html staging/ 2>/dev/null || true
+          cp initial.png staging/ 2>/dev/null || true
+          
+          # Copy built exam-diary to sub-path
+          mkdir -p staging/exam-diary
+          cp -r exam-diary/dist/* staging/exam-diary/
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload build output (dist directory)
-          path: './dist'
+          # Upload the prepared staging directory
+          path: './staging'
           
       - name: Deploy to GitHub Pages
         id: deployment
