@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Giao diện ExamNotebook</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&amp;family=Patrick+Hand&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#BC2E2E",
+              "background-light": "#fdfbf7",
+              "background-dark": "#1f1313",
+              "paper-line": "#a3b8d6",
+            },
+            fontFamily: {
+              "display": ["Plus Jakarta Sans", "sans-serif"],
+              "handwriting": ["Kalam", "cursive"],
+              "marker": ["Patrick Hand", "cursive"],
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+            backgroundImage: {
+                'paper-pattern': "linear-gradient(#e5e7eb 1px, transparent 1px)",
+                'notebook-lines': "repeating-linear-gradient(transparent, transparent 31px, #e2e8f0 31px, #e2e8f0 32px)"
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .notebook-paper {
+            background-color: #fffdf9;
+            background-image: linear-gradient(#e9e9e9 1px, transparent 1px);
+            background-size: 100% 2rem;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.05);
+        }
+        .dark .notebook-paper {
+            background-color: #2a2222;
+            background-image: linear-gradient(#3a3232 1px, transparent 1px);
+        }
+        .hand-drawn-border {
+            border: 2px solid currentColor;
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        }
+        .hand-checkbox:checked + div {
+            border-color: #BC2E2E;
+            background-color: rgba(188, 46, 46, 0.05);
+        }
+        .hand-checkbox:checked + div .check-mark {
+            opacity: 1;
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden transition-colors duration-200">
+<header class="flex items-center justify-between whitespace-nowrap border-b-2 border-dashed border-slate-300 dark:border-slate-700 px-6 lg:px-10 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<div class="text-primary animate-pulse">
+<span class="material-symbols-outlined text-3xl">menu_book</span>
+</div>
+<div>
+<h2 class="text-slate-900 dark:text-white text-xl lg:text-2xl font-handwriting font-bold leading-tight">ExamNotebook</h2>
+<p class="text-xs text-slate-500 font-marker uppercase tracking-widest">Hệ thống thi trực tuyến</p>
+</div>
+</div>
+<div class="flex items-center gap-4 lg:gap-8">
+<div class="hidden md:flex items-center gap-3 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-full hand-drawn-border border-slate-300 dark:border-slate-600">
+<span class="material-symbols-outlined text-primary">schedule</span>
+<div class="flex items-baseline gap-1 font-marker text-lg">
+<span class="font-bold text-slate-900 dark:text-white w-6 text-center">01</span>:
+                <span class="font-bold text-slate-900 dark:text-white w-6 text-center">29</span>:
+                <span class="font-bold text-primary w-6 text-center">45</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-bold text-slate-900 dark:text-white">Minh Anh</p>
+<p class="text-xs text-slate-500">ID: 849201</p>
+</div>
+<div class="bg-center bg-no-repeat bg-cover rounded-full h-10 w-10 border-2 border-white shadow-sm" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA4AQ8pywl-LaTsc4sijAe3XT8iEiWZJZGWGNaRWIBPt3ToCR53gYFfdLS3lGL606AR07BmWWVpnCzJsTXTSvDx6_afcQB3A6yUjti14fEr3iy316py-k_guoOQ1hx1RtG32KkGR2pw2RLWSLDDzMcYFQsoNtP8KhQOtxxRJtsUEm5yzE2UVz3QiJ-reqQ9NLxHRNwf1mlgJvzTVCexBxrLhaovLHR5-QULY4UoJkWR1b7tHrt4D80wN1HXMWzATB3Qa4sSlydWJqs");'>
+</div>
+</div>
+<button class="flex items-center justify-center gap-2 bg-primary hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-handwriting text-lg font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all">
+<span>Nộp bài</span>
+<span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+</header>
+<main class="flex-1 w-full max-w-5xl mx-auto p-4 md:p-8 flex flex-col lg:flex-row gap-8">
+<aside class="w-full lg:w-64 flex flex-col gap-6 shrink-0">
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/40 via-primary to-primary/40"></div>
+<h1 class="text-2xl font-handwriting font-bold text-slate-900 dark:text-white mb-2">Lịch sử 101</h1>
+<p class="text-slate-500 dark:text-slate-400 font-marker text-lg mb-4">Kiểm tra giữa kỳ</p>
+<div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 mb-2">
+<span class="material-symbols-outlined text-lg">folder_open</span>
+<span>Phần 1: Cách mạng Công nghiệp</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-marker text-xl text-slate-900 dark:text-white">Danh sách câu hỏi</h3>
+<span class="text-xs bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded text-slate-500">7/20</span>
+</div>
+<div class="grid grid-cols-5 gap-2">
+<button class="aspect-square flex items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-handwriting font-bold text-lg border border-transparent hover:border-green-500 transition-colors">1</button>
+<button class="aspect-square flex items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-handwriting font-bold text-lg border border-transparent hover:border-green-500 transition-colors">2</button>
+<button class="aspect-square flex items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-handwriting font-bold text-lg border border-transparent hover:border-green-500 transition-colors">3</button>
+<button class="aspect-square flex items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-handwriting font-bold text-lg border border-transparent hover:border-green-500 transition-colors">4</button>
+<button class="aspect-square flex items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-handwriting font-bold text-lg border border-transparent hover:border-green-500 transition-colors">5</button>
+<button class="aspect-square flex items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-handwriting font-bold text-lg border border-amber-300 relative" title="Đánh dấu">
+                    6
+                    <span class="absolute top-0 right-0 w-2 h-2 bg-amber-500 rounded-full translate-x-1/4 -translate-y-1/4"></span>
+</button>
+<button class="aspect-square flex items-center justify-center rounded-lg bg-primary text-white font-handwriting font-bold text-xl shadow-lg scale-110 transform z-10 hand-drawn-border border-white ring-2 ring-primary/20">7</button>
+<button class="aspect-square flex items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-400 font-handwriting text-lg hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">8</button>
+<button class="aspect-square flex items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-400 font-handwriting text-lg hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">9</button>
+<button class="aspect-square flex items-center justify-center rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-400 font-handwriting text-lg hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors">10</button>
+</div>
+<div class="mt-6 flex flex-wrap gap-3 text-xs text-slate-500 font-marker">
+<div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-green-100 border border-green-500"></div> Đã làm</div>
+<div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-primary"></div> Hiện tại</div>
+<div class="flex items-center gap-1"><div class="w-3 h-3 rounded-full bg-amber-100 border border-amber-500"></div> Đánh dấu</div>
+</div>
+</div>
+<div class="md:hidden flex items-center justify-center gap-3 bg-white dark:bg-slate-800 px-4 py-3 rounded-xl shadow-sm border border-slate-200">
+<span class="material-symbols-outlined text-primary">schedule</span>
+<span class="font-marker font-bold text-xl">01:29:45</span>
+</div>
+</aside>
+<section class="flex-1 flex flex-col h-full">
+<div class="notebook-paper w-full h-full min-h-[600px] p-8 md:p-12 relative rounded-r-xl rounded-bl-xl shadow-md border-l-4 border-l-red-200 dark:border-l-red-900/50">
+<div class="absolute left-4 top-0 bottom-0 flex flex-col justify-evenly py-8 pointer-events-none">
+<div class="w-4 h-4 rounded-full bg-background-light dark:bg-background-dark shadow-inner mb-8"></div>
+<div class="w-4 h-4 rounded-full bg-background-light dark:bg-background-dark shadow-inner mb-8"></div>
+<div class="w-4 h-4 rounded-full bg-background-light dark:bg-background-dark shadow-inner"></div>
+</div>
+<div class="ml-6 md:ml-10 h-full flex flex-col relative z-10">
+<div class="flex justify-between items-start mb-8 pb-4 border-b-2 border-primary/20">
+<div>
+<span class="inline-block px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded text-slate-500 text-sm font-bold uppercase tracking-wide mb-2">Trắc nghiệm</span>
+<h2 class="text-3xl md:text-4xl font-handwriting font-bold text-slate-800 dark:text-slate-100 leading-snug">
+                            Câu hỏi 7
+                        </h2>
+</div>
+<button class="text-slate-400 hover:text-amber-500 transition-colors p-2" title="Đánh dấu để xem lại">
+<span class="material-symbols-outlined text-3xl">flag</span>
+</button>
+</div>
+<div class="mb-10">
+<p class="text-2xl font-handwriting text-slate-700 dark:text-slate-200 leading-relaxed">
+                        Phát minh nào đóng vai trò then chốt trong ngành dệt may trong cuộc Cách mạng Công nghiệp?
+                    </p>
+</div>
+<div class="flex flex-col gap-5 mb-auto">
+<label class="group cursor-pointer relative">
+<input class="hand-checkbox peer sr-only" name="q7" type="radio"/>
+<div class="flex items-center p-4 rounded-2xl border-2 border-slate-300 dark:border-slate-600 bg-white/50 dark:bg-slate-800/50 hover:bg-white hover:shadow-md transition-all hand-drawn-border group-hover:border-slate-400">
+<div class="w-10 h-10 shrink-0 rounded-full border-2 border-slate-400 flex items-center justify-center mr-5 font-marker text-xl font-bold text-slate-500 peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary transition-colors">
+                                A
+                            </div>
+<span class="text-xl font-handwriting text-slate-800 dark:text-slate-100">Động cơ hơi nước</span>
+<div class="check-mark absolute right-6 text-primary opacity-0 transform scale-50 transition-all duration-300">
+<span class="material-symbols-outlined text-3xl">check_circle</span>
+</div>
+</div>
+</label>
+<label class="group cursor-pointer relative">
+<input class="hand-checkbox peer sr-only" name="q7" type="radio"/>
+<div class="flex items-center p-4 rounded-2xl border-2 border-slate-300 dark:border-slate-600 bg-white/50 dark:bg-slate-800/50 hover:bg-white hover:shadow-md transition-all hand-drawn-border group-hover:border-slate-400">
+<div class="w-10 h-10 shrink-0 rounded-full border-2 border-slate-400 flex items-center justify-center mr-5 font-marker text-xl font-bold text-slate-500 peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary transition-colors">
+                                B
+                            </div>
+<span class="text-xl font-handwriting text-slate-800 dark:text-slate-100">Máy kéo sợi Spinning Jenny</span>
+<div class="check-mark absolute right-6 text-primary opacity-0 transform scale-50 transition-all duration-300">
+<span class="material-symbols-outlined text-3xl">check_circle</span>
+</div>
+</div>
+</label>
+<label class="group cursor-pointer relative">
+<input class="hand-checkbox peer sr-only" name="q7" type="radio"/>
+<div class="flex items-center p-4 rounded-2xl border-2 border-slate-300 dark:border-slate-600 bg-white/50 dark:bg-slate-800/50 hover:bg-white hover:shadow-md transition-all hand-drawn-border group-hover:border-slate-400">
+<div class="w-10 h-10 shrink-0 rounded-full border-2 border-slate-400 flex items-center justify-center mr-5 font-marker text-xl font-bold text-slate-500 peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary transition-colors">
+                                C
+                            </div>
+<span class="text-xl font-handwriting text-slate-800 dark:text-slate-100">Máy điện báo</span>
+<div class="check-mark absolute right-6 text-primary opacity-0 transform scale-50 transition-all duration-300">
+<span class="material-symbols-outlined text-3xl">check_circle</span>
+</div>
+</div>
+</label>
+<label class="group cursor-pointer relative">
+<input class="hand-checkbox peer sr-only" name="q7" type="radio"/>
+<div class="flex items-center p-4 rounded-2xl border-2 border-slate-300 dark:border-slate-600 bg-white/50 dark:bg-slate-800/50 hover:bg-white hover:shadow-md transition-all hand-drawn-border group-hover:border-slate-400">
+<div class="w-10 h-10 shrink-0 rounded-full border-2 border-slate-400 flex items-center justify-center mr-5 font-marker text-xl font-bold text-slate-500 peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary transition-colors">
+                                D
+                            </div>
+<span class="text-xl font-handwriting text-slate-800 dark:text-slate-100">Máy in ấn</span>
+<div class="check-mark absolute right-6 text-primary opacity-0 transform scale-50 transition-all duration-300">
+<span class="material-symbols-outlined text-3xl">check_circle</span>
+</div>
+</div>
+</label>
+</div>
+<div class="flex justify-between items-center mt-12 pt-6 border-t-2 border-dashed border-slate-300 dark:border-slate-600">
+<button class="flex items-center gap-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 font-marker text-xl font-bold group px-4 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+<span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                        Quay lại
+                    </button>
+<div class="hidden sm:flex gap-1">
+<div class="h-2 w-2 rounded-full bg-slate-300"></div>
+<div class="h-2 w-2 rounded-full bg-slate-300"></div>
+<div class="h-2 w-2 rounded-full bg-primary animate-pulse"></div>
+<div class="h-2 w-2 rounded-full bg-slate-300"></div>
+<div class="h-2 w-2 rounded-full bg-slate-300"></div>
+</div>
+<button class="flex items-center gap-2 bg-slate-800 text-white hover:bg-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-white px-6 py-3 rounded-xl font-marker text-xl font-bold shadow-md group hand-drawn-border transition-all hover:shadow-lg active:scale-95">
+                        Tiếp theo
+                        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+<div class="absolute bottom-4 right-4 opacity-10 pointer-events-none rotate-12 hidden md:block">
+<svg class="text-slate-900 dark:text-white" fill="none" height="100" stroke="currentColor" stroke-width="2" viewBox="0 0 100 100" width="100">
+<path d="M10,50 Q25,25 50,50 T90,50"></path>
+<path d="M50,10 L50,90"></path>
+<circle cx="50" cy="50" r="30"></circle>
+</svg>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="w-full text-center py-6 text-slate-400 dark:text-slate-600 text-sm font-marker">
+<p>© 2023 Hệ thống ExamNotebook. Tất cả câu trả lời được lưu tự động.</p>
+</footer>
+
+</body></html>

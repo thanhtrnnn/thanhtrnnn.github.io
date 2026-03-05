@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trang chủ Cổng thi phong cách Nhật ký</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Patrick+Hand&amp;family=Kalam:wght@300;400;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#bd2e2e",
+                        "primary-dark": "#8a1c1c",
+                        "secondary": "#d4af37", // Gold
+                        "paper": "#fcfaf7",
+                        "paper-dark": "#e8e3dc",
+                        "ink": "#2c2424",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "hand": ["Kalam", "cursive"],
+                        "note": ["Patrick Hand", "cursive"],
+                    },
+                    backgroundImage: {
+                        'paper-pattern': "url('https://www.transparenttextures.com/patterns/cream-paper.png')",
+                    },
+                    boxShadow: {
+                        'paper': '2px 3px 5px rgba(0,0,0,0.1)',
+                        'lifted': '4px 6px 12px rgba(0,0,0,0.15)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .hand-border {
+            border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        }
+        .tape {
+            background-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            backdrop-filter: blur(2px);
+            transform: rotate(-2deg);
+            border-left: 1px dashed rgba(0,0,0,0.1);
+            border-right: 1px dashed rgba(0,0,0,0.1);
+        }
+        .notebook-lines {
+            background-image: linear-gradient(#e5e5e5 1px, transparent 1px);
+            background-size: 100% 2rem;
+        }
+    </style>
+</head>
+<body class="bg-[#f0ece6] min-h-screen font-display text-ink overflow-x-hidden selection:bg-primary/20 selection:text-primary">
+<div class="flex min-h-screen w-full">
+<aside class="w-24 md:w-64 flex-shrink-0 bg-[#2c2424] text-[#fcfaf7] relative flex flex-col items-center md:items-stretch py-8 z-20 shadow-xl border-r-4 border-[#1a1515]">
+<div class="absolute right-[-14px] top-0 bottom-0 w-8 flex flex-col gap-6 py-4 pointer-events-none z-30">
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+<div class="h-4 w-8 bg-gradient-to-r from-gray-400 via-gray-200 to-gray-500 rounded-full shadow-md transform -rotate-6"></div>
+</div>
+<div class="px-4 mb-10 text-center md:text-left">
+<h1 class="font-hand text-3xl text-secondary font-bold tracking-wider rotate-[-2deg]">Nhật ký<span class="text-primary">Thi</span></h1>
+<p class="hidden md:block text-xs text-gray-400 font-note tracking-widest uppercase mt-1">Cổng Sinh Viên v2.0</p>
+</div>
+<nav class="flex flex-col gap-4 w-full pr-0 md:pr-4">
+<a class="group relative flex items-center gap-3 px-4 py-3 bg-[#fcfaf7] text-primary ml-2 rounded-l-md shadow-[-4px_4px_0px_rgba(0,0,0,0.2)] translate-x-1 transition-transform hover:translate-x-0" href="#">
+<span class="material-symbols-outlined text-3xl md:text-2xl">home</span>
+<span class="hidden md:block font-hand font-bold text-xl">Trang chủ</span>
+<div class="absolute right-0 top-0 bottom-0 w-4 bg-[#fcfaf7] translate-x-full"></div>
+</a>
+<a class="group relative flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-[#fcfaf7] hover:bg-[#3d3333] transition-colors ml-2 rounded-l-md" href="#">
+<span class="material-symbols-outlined text-3xl md:text-2xl">menu_book</span>
+<span class="hidden md:block font-hand font-bold text-xl">Kỳ thi của tôi</span>
+</a>
+<a class="group relative flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-[#fcfaf7] hover:bg-[#3d3333] transition-colors ml-2 rounded-l-md" href="#">
+<span class="material-symbols-outlined text-3xl md:text-2xl">bar_chart</span>
+<span class="hidden md:block font-hand font-bold text-xl">Điểm số</span>
+</a>
+<a class="group relative flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-[#fcfaf7] hover:bg-[#3d3333] transition-colors ml-2 rounded-l-md" href="#">
+<span class="material-symbols-outlined text-3xl md:text-2xl">account_circle</span>
+<span class="hidden md:block font-hand font-bold text-xl">Hồ sơ</span>
+</a>
+<a class="group relative flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-[#fcfaf7] hover:bg-[#3d3333] transition-colors ml-2 rounded-l-md mt-auto" href="#">
+<span class="material-symbols-outlined text-3xl md:text-2xl">settings</span>
+<span class="hidden md:block font-hand font-bold text-xl">Cài đặt</span>
+</a>
+</nav>
+</aside>
+<main class="flex-1 relative bg-paper notebook-lines shadow-inner pt-8 px-6 md:px-12 pb-12 overflow-y-auto">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 relative">
+<div>
+<h2 class="font-hand text-5xl text-ink font-bold mb-2">Xin chào, Alex!</h2>
+<p class="font-note text-xl text-gray-500 rotate-[-1deg]">Sẵn sàng chinh phục các kỳ thi hôm nay chưa?</p>
+</div>
+<div class="relative w-full md:w-96">
+<div class="absolute -inset-1 border-2 border-primary/30 hand-border transform rotate-1 pointer-events-none"></div>
+<div class="relative flex items-center bg-white/50 rounded-full px-4 py-2 border border-gray-300 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+<span class="material-symbols-outlined text-gray-400">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-note text-lg placeholder-gray-400 text-ink" placeholder="Tìm kiếm ghi chú, kỳ thi..." type="text"/>
+</div>
+</div>
+<div class="absolute top-0 right-0 hidden lg:block opacity-20 transform rotate-12 pointer-events-none">
+<div class="border-4 border-primary rounded-full w-32 h-32 flex items-center justify-center">
+<div class="text-primary font-bold text-xl text-center leading-tight uppercase tracking-widest">
+                        THÁNG 11<br/><span class="text-4xl">24</span><br/>2023
+                    </div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-8 space-y-8">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary">edit_note</span>
+<h3 class="font-display font-bold text-2xl border-b-2 border-dashed border-primary/30 pb-1 w-full">Kỳ thi hiện tại</h3>
+</div>
+<div class="relative bg-white p-6 shadow-paper rotate-[-1deg] hover:rotate-0 transition-transform duration-300 mb-8 mx-2">
+<div class="tape absolute -top-3 left-1/2 -translate-x-1/2 w-32 h-8 z-10 opacity-70"></div>
+<div class="flex flex-col md:flex-row gap-6">
+<div class="w-full md:w-48 h-32 bg-gray-100 rounded-lg overflow-hidden relative flex-shrink-0 border-2 border-dashed border-gray-300">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center" data-alt="Geometric math pattern background">
+<span class="material-symbols-outlined text-6xl text-primary/40">functions</span>
+</div>
+<div class="absolute bottom-0 w-full bg-primary py-1 text-center text-white text-xs font-bold tracking-widest uppercase">Ưu tiên cao</div>
+</div>
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<h4 class="font-hand text-3xl font-bold text-ink mb-1">Giải Tích Nâng Cao II</h4>
+<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-bold border border-yellow-200">Còn 2 giờ</span>
+</div>
+<p class="font-note text-lg text-gray-600 mb-4">Kỳ thi cuối kỳ. Bao gồm tích phân và đạo hàm.</p>
+<div class="flex items-center gap-4 text-sm text-gray-500 font-display">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-lg">schedule</span>
+<span>120 Phút</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-lg">format_list_numbered</span>
+<span>45 Câu hỏi</span>
+</div>
+</div>
+</div>
+<div class="mt-4 flex justify-end">
+<button class="font-hand font-bold text-xl text-white bg-primary px-6 py-2 rounded-sm shadow-[2px_2px_0px_#2c2424] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] border-2 border-[#2c2424] hover:bg-primary-dark transition-colors flex items-center gap-2">
+                                    Bắt đầu thi
+                                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="relative bg-white p-6 shadow-paper rotate-[1deg] hover:rotate-0 transition-transform duration-300 mx-2">
+<div class="absolute -top-3 right-4 z-10 drop-shadow-md">
+<div class="w-4 h-4 rounded-full bg-primary border-2 border-red-900"></div>
+<div class="w-[2px] h-3 bg-gray-400 mx-auto"></div>
+</div>
+<div class="flex flex-col md:flex-row gap-6">
+<div class="w-full md:w-48 h-32 bg-gray-100 rounded-lg overflow-hidden relative flex-shrink-0 border-2 border-dashed border-gray-300">
+<div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center" data-alt="Molecular structure pattern background">
+<span class="material-symbols-outlined text-6xl text-blue-300">science</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<h4 class="font-hand text-3xl font-bold text-ink mb-1">Hóa Học Hữu Cơ</h4>
+<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-bold border border-green-200">Đang mở</span>
+</div>
+<p class="font-note text-lg text-gray-600 mb-4">Đánh giá giữa kỳ. Tập trung vào liên kết carbon.</p>
+<div class="flex items-center gap-4 text-sm text-gray-500 font-display">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-lg">schedule</span>
+<span>90 Phút</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-lg">format_list_numbered</span>
+<span>30 Câu hỏi</span>
+</div>
+</div>
+</div>
+<div class="mt-4 flex justify-end">
+<button class="font-hand font-bold text-xl text-ink bg-white px-6 py-2 rounded-sm shadow-[2px_2px_0px_#2c2424] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] border-2 border-[#2c2424] hover:bg-gray-50 transition-colors flex items-center gap-2">
+                                    Tiếp tục
+                                    <span class="material-symbols-outlined">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-4 space-y-8 mt-8 lg:mt-0">
+<div class="bg-[#fef3c7] p-6 shadow-lifted transform rotate-2 relative max-w-sm mx-auto">
+<div class="absolute top-0 left-0 w-full h-8 bg-black/5"></div> 
+<h3 class="font-hand text-2xl font-bold text-ink mb-4 mt-2">Tiến độ của tôi</h3>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between font-note text-lg mb-1">
+<span>Toán học</span>
+<span class="font-bold">85%</span>
+</div>
+<div class="w-full bg-white/50 h-3 rounded-full overflow-hidden border border-yellow-400/30">
+<div class="h-full bg-primary w-[85%] rounded-full relative overflow-hidden">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] opacity-20"></div>
+</div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-note text-lg mb-1">
+<span>Vật lý</span>
+<span class="font-bold">62%</span>
+</div>
+<div class="w-full bg-white/50 h-3 rounded-full overflow-hidden border border-yellow-400/30">
+<div class="h-full bg-secondary w-[62%] rounded-full relative overflow-hidden">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] opacity-20"></div>
+</div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-note text-lg mb-1">
+<span>Lịch sử</span>
+<span class="font-bold">92%</span>
+</div>
+<div class="w-full bg-white/50 h-3 rounded-full overflow-hidden border border-yellow-400/30">
+<div class="h-full bg-green-600 w-[92%] rounded-full relative overflow-hidden">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] opacity-20"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-yellow-400/30">
+<p class="font-hand text-center text-gray-600">"Cố lên! Con làm tốt lắm."</p>
+<div class="text-right mt-2 text-2xl font-hand text-primary">- Mẹ</div>
+</div>
+</div>
+<div class="bg-[#e0f2fe] p-6 shadow-lifted transform -rotate-1 relative max-w-sm mx-auto">
+<div class="absolute top-0 left-0 w-full h-8 bg-black/5"></div>
+<h3 class="font-hand text-2xl font-bold text-ink mb-4 mt-2">Sắp diễn ra</h3>
+<ul class="list-disc list-inside space-y-2 font-note text-lg text-slate-700">
+<li><span class="font-bold">10/12:</span> Tiểu luận Văn học</li>
+<li><span class="font-bold">15/12:</span> Thực hành Tin học</li>
+<li><span class="font-bold">20/12:</span> Nghỉ Đông! ❄️</li>
+</ul>
+</div>
+<div class="relative w-full max-w-sm mx-auto mt-8 rotate-3">
+<div class="tape absolute -top-4 left-1/2 -translate-x-1/2 w-24 h-6 z-10 opacity-60"></div>
+<div class="bg-white p-3 pb-8 shadow-md border border-gray-200 transform hover:-rotate-2 transition-transform duration-300">
+<div class="bg-gray-800 h-40 w-full overflow-hidden grayscale hover:grayscale-0 transition-all duration-500" data-alt="Study group session photo">
+<div class="h-full w-full bg-gradient-to-tr from-gray-700 to-gray-500 flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-4xl">groups</span>
+</div>
+</div>
+<p class="font-hand text-center mt-3 text-xl text-gray-600">Học nhóm lúc 5h chiều</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-12 text-center opacity-60">
+<div class="inline-block relative">
+<svg class="w-32 h-12 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 100 20">
+<path d="M0,10 Q25,20 50,10 T100,10"></path>
+</svg>
+<p class="font-note text-sm">ExamDiary © 2023</p>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #bd2e2e;
+  --color-primary-dark: #8a1c1c;
+  --color-secondary: #d4af37;
+  --color-background-light: #fdfbf7;
+  --color-background-dark: #1f1313;
+  --color-paper: #fcfaf7;
+  --color-paper-dark: #e8e3dc;
+  --color-ink: #2c2424;
+  --color-pencil: #6b5d5d;
+  --color-paper-line: #a3b8d6;
+  --color-margin: #ffcccc;
+  
+  --font-display: "Momo Trust Display", "Plus Jakarta Sans", sans-serif;
+  --font-hand: "Momo Signature", "Patrick Hand", cursive;
+  --font-note: "Momo Signature", "Patrick Hand", cursive;
+  --font-serif: "Noto Serif", serif;
+  --font-sans: "Momo Trust Sans", "Noto Sans", sans-serif;
+  --font-vietnam: "Be Vietnam Pro", sans-serif;
+}
+
+/* Custom styles from the HTMLs */
+.diary-paper {
+    background-color: #fdfbf7;
+    background-image: 
+        linear-gradient(#e5e0d8 1px, transparent 1px),
+        linear-gradient(90deg, #e5e0d8 1px, transparent 1px);
+    background-size: 20px 20px;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.1), inset 0 0 40px rgba(189, 46, 46, 0.05);
+}
+
+.torn-edge {
+    clip-path: polygon(
+        0% 0%, 100% 0%, 100% 100%, 
+        98% 99%, 96% 100%, 94% 99%, 92% 100%, 90% 99%, 88% 100%, 86% 99%, 84% 100%, 82% 99%, 80% 100%, 78% 99%, 76% 100%, 74% 99%, 72% 100%, 70% 99%, 68% 100%, 66% 99%, 64% 100%, 62% 99%, 60% 100%, 58% 99%, 56% 100%, 54% 99%, 52% 100%, 50% 99%, 48% 100%, 46% 99%, 44% 100%, 42% 99%, 40% 100%, 38% 99%, 36% 100%, 34% 99%, 32% 100%, 30% 99%, 28% 100%, 26% 99%, 24% 100%, 22% 99%, 20% 100%, 18% 99%, 16% 100%, 14% 99%, 12% 100%, 10% 99%, 8% 100%, 6% 99%, 4% 100%, 2% 99%, 0% 100%
+    );
+}
+
+.handwritten-border {
+    border: 2px solid #2c2424;
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+}
+
+.tape {
+    background-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    backdrop-filter: blur(2px);
+    transform: rotate(-2deg);
+    border-left: 1px dashed rgba(0,0,0,0.1);
+    border-right: 1px dashed rgba(0,0,0,0.1);
+}
+
+.notebook-paper {
+    background-color: #fffdf9;
+    background-image: linear-gradient(#e9e9e9 1px, transparent 1px);
+    background-size: 100% 2rem;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.05);
+}
+
+.dark .notebook-paper {
+    background-color: #2a2222;
+    background-image: linear-gradient(#3a3232 1px, transparent 1px);
+}
+
+.hand-checkbox:checked + div {
+    border-color: #bd2e2e;
+    background-color: rgba(189, 46, 46, 0.05);
+}
+
+.hand-checkbox:checked + div .check-mark {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.notebook-lines {
+    background-image: linear-gradient(#e5e5e5 1px, transparent 1px);
+    background-size: 100% 2rem;
+}
+
+.bg-paper-texture {
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNiIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNub2lzZSkiIG9wYWNpdHk9IjAuMDUiLz48L3N2Zz4=');
+}
+
+.bg-ruled-paper {
+    background-image: linear-gradient(#e5e5e5 1px, transparent 1px);
+    background-size: 100% 2rem;
+}
