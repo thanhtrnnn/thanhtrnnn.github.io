@@ -11,6 +11,7 @@ import AdminLogin from './pages/AdminLogin';
 import CreateExam from './pages/CreateExam';
 import AdminStats from './pages/AdminStats';
 import AdminStudentResults from './pages/AdminStudentResults';
+import AdminUsers from './pages/AdminUsers';
 import { initQuizanoData } from './lib/mockData';
 
 export default function App() {
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/admin/exam/new" element={<CreateExam />} />
         <Route path="/admin/stats" element={<AdminStats />} />
         <Route path="/admin/results" element={<AdminStudentResults />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
       </Routes>
     </Router>
   );

@@ -168,7 +168,7 @@ export function getCurrentUser() {
 
 export function logout() {
     localStorage.removeItem('quizano_currentUser');
-    window.location.href = '/login';
+    window.location.href = import.meta.env.BASE_URL;
 }
 
 export function setLogin(user: any) {
