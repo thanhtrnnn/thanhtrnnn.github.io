@@ -1,0 +1,1278 @@
+openapi: 3.0.3
+info:
+  title: Quizano Simple App API
+  version: 1.0.0
+  description: Node.js API for a simplified Quizano app with student and admin flows.
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: Health
+    description: Service status
+  - name: Auth
+    description: Authentication and current user session
+  - name: Users
+    description: Admin user management APIs
+  - name: Exams
+    description: Exam and question management
+  - name: Results
+    description: Student submit and result viewing APIs
+  - name: Admin
+    description: Admin reports and statistics
+paths:
+  /api/v1/health:
+    get:
+      tags: [Health]
+      summary: Health check
+      responses:
+        '200':
+          description: Service is running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  service:
+                    type: string
+              example:
+                ok: true
+                service: quizano-api
+
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register student account
+      description: Register a new student user and return access token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              fullName: Nguyen Van C
+              username: nguyenvanc
+              email: nguyenvanc@gmail.com
+              password: '123456'
+      responses:
+        '201':
+          description: Registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login
+      description: Login by username and password. Optionally restrict role by passing role in body.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              username: admin
+              password: '123'
+              role: admin
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/auth/me:
+    get:
+      tags: [Auth]
+      summary: Current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current authenticated user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/users:
+    get:
+      tags: [Users]
+      summary: List users
+      description: Admin only. Filter by role and search keyword.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: role
+          schema:
+            type: string
+            enum: [student, admin]
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Users list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/v1/users/students:
+    post:
+      tags: [Users]
+      summary: Create student user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStudentRequest'
+      responses:
+        '201':
+          description: Student created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/v1/users/{userId}:
+    put:
+      tags: [Users]
+      summary: Update user profile
+      description: Admin only. Update fullName, email, password.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    delete:
+      tags: [Users]
+      summary: Delete user
+      description: Admin only. Cannot delete admin user.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      deleted:
+                        type: boolean
+                      userId:
+                        type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/exams:
+    get:
+      tags: [Exams]
+      summary: List exams
+      description: Students only receive active exams.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [free, scheduled]
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [active, inactive]
+        - in: query
+          name: availableNow
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Exams list with metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ExamWithMeta'
+    post:
+      tags: [Exams]
+      summary: Create exam
+      description: Admin only. Supports nested questions creation.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExamRequest'
+      responses:
+        '201':
+          description: Created exam
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      exam:
+                        $ref: '#/components/schemas/Exam'
+                      questionsCount:
+                        type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/v1/exams/{examId}:
+    get:
+      tags: [Exams]
+      summary: Get exam by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: examId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Exam detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/ExamWithMeta'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Exams]
+      summary: Update exam
+      description: Admin only. Can include questions array for full replacement.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: examId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateExamRequest'
+      responses:
+        '200':
+          description: Updated exam
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Exam'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Exams]
+      summary: Delete exam and linked questions
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: examId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      deleted:
+                        type: boolean
+                      examId:
+                        type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/exams/{examId}/questions:
+    get:
+      tags: [Exams]
+      summary: Get questions by exam
+      description: Students receive no correctOptionId/explanation. Admin can request includeAnswers=true.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: examId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: includeAnswers
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Questions list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/QuestionPublic'
+                        - $ref: '#/components/schemas/Question'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Exams]
+      summary: Replace all questions of exam
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: examId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [questions]
+              properties:
+                questions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/QuestionInput'
+      responses:
+        '200':
+          description: Questions replaced
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      examId:
+                        type: string
+                      questionsCount:
+                        type: integer
+
+  /api/v1/exams/{examId}/questions/import:
+    post:
+      tags: [Exams]
+      summary: Import questions from row payload
+      description: Admin only. Import rows similar to excel parsed output.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: examId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportQuestionsRequest'
+      responses:
+        '200':
+          description: Import completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      importedCount:
+                        type: integer
+                      examId:
+                        type: string
+
+  /api/v1/results/submit:
+    post:
+      tags: [Results]
+      summary: Submit exam answers
+      description: Student only.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitResultRequest'
+      responses:
+        '201':
+          description: Submission accepted and graded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      resultId:
+                        type: string
+                      score:
+                        type: number
+                      correctCount:
+                        type: integer
+                      totalQuestions:
+                        type: integer
+                      status:
+                        type: string
+                        example: completed
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/results/me:
+    get:
+      tags: [Results]
+      summary: List current student's results
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: examId
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Results list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Result'
+
+  /api/v1/results/me/latest:
+    get:
+      tags: [Results]
+      summary: Latest result of current student
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Latest result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Result'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/results/{resultId}:
+    get:
+      tags: [Results]
+      summary: Get result by id
+      description: Student can read own result, admin can read any.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: resultId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: includeDetails
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Result detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/Result'
+                      - $ref: '#/components/schemas/ResultDetailed'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/admin/results:
+    get:
+      tags: [Admin]
+      summary: Query result records with pagination
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: examId
+          schema:
+            type: string
+        - in: query
+          name: studentId
+          schema:
+            type: string
+        - in: query
+          name: from
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: to
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Paginated result list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminResultsResponse'
+
+  /api/v1/admin/stats/summary:
+    get:
+      tags: [Admin]
+      summary: Score summary and distribution
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: examId
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Summary metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/StatsSummary'
+
+  /api/v1/admin/students/{studentId}/journey:
+    get:
+      tags: [Admin]
+      summary: Student exam journey
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Student journey response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentJourneyResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/admin/students/{studentId}/results/{resultId}:
+    get:
+      tags: [Admin]
+      summary: Admin view detailed result of one student
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: resultId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detailed result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/AdminDetailedResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            ok: false
+            error:
+              message: Validation failed
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            ok: false
+            error:
+              message: Invalid or expired access token
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            ok: false
+            error:
+              message: Forbidden
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            ok: false
+            error:
+              message: Resource not found
+    Conflict:
+      description: Conflict state
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            ok: false
+            error:
+              message: Username already exists
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            details:
+              nullable: true
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [student, admin]
+
+    AuthSuccessResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+            user:
+              $ref: '#/components/schemas/User'
+
+    RegisterRequest:
+      type: object
+      required: [fullName, username, email, password]
+      properties:
+        fullName:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 3
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: [student, admin]
+
+    CreateStudentRequest:
+      allOf:
+        - $ref: '#/components/schemas/RegisterRequest'
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    Exam:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [free, scheduled]
+        duration:
+          type: integer
+        status:
+          type: string
+          enum: [active, inactive]
+        startTime:
+          type: string
+          format: date-time
+          nullable: true
+        endTime:
+          type: string
+          format: date-time
+          nullable: true
+
+    ExamWithMeta:
+      allOf:
+        - $ref: '#/components/schemas/Exam'
+        - type: object
+          properties:
+            questionCount:
+              type: integer
+            availableNow:
+              type: boolean
+
+    Option:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+
+    QuestionInput:
+      type: object
+      required: [content, options, correctOptionId]
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        correctOptionId:
+          type: string
+        explanation:
+          type: string
+
+    Question:
+      allOf:
+        - type: object
+          properties:
+            examId:
+              type: string
+        - $ref: '#/components/schemas/QuestionInput'
+
+    QuestionPublic:
+      type: object
+      properties:
+        id:
+          type: string
+        examId:
+          type: string
+        content:
+          type: string
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+
+    CreateExamRequest:
+      type: object
+      required: [title, description, type, duration, status]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [free, scheduled]
+        duration:
+          type: integer
+        status:
+          type: string
+          enum: [active, inactive]
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionInput'
+
+    UpdateExamRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateExamRequest'
+
+    ImportQuestionRow:
+      type: object
+      properties:
+        question:
+          type: string
+        optionA:
+          type: string
+        optionB:
+          type: string
+        optionC:
+          type: string
+        optionD:
+          type: string
+        correctOption:
+          type: string
+          enum: [A, B, C, D]
+        explanation:
+          type: string
+
+    ImportQuestionsRequest:
+      type: object
+      required: [rows]
+      properties:
+        rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportQuestionRow'
+
+    AnswerInput:
+      type: object
+      required: [questionId]
+      properties:
+        questionId:
+          type: string
+        selectedOptionId:
+          type: string
+          nullable: true
+
+    SubmitResultRequest:
+      type: object
+      required: [examId, answers]
+      properties:
+        examId:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnswerInput'
+
+    Result:
+      type: object
+      properties:
+        id:
+          type: string
+        studentId:
+          type: string
+        examId:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        submitTime:
+          type: string
+          format: date-time
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnswerInput'
+        correctCount:
+          type: integer
+        totalQuestions:
+          type: integer
+        score:
+          type: number
+        status:
+          type: string
+          example: completed
+
+    ResultQuestionDetail:
+      type: object
+      properties:
+        questionId:
+          type: string
+        content:
+          type: string
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        selectedOptionId:
+          type: string
+          nullable: true
+        correctOptionId:
+          type: string
+        isCorrect:
+          type: boolean
+        explanation:
+          type: string
+
+    ResultDetailed:
+      allOf:
+        - $ref: '#/components/schemas/Result'
+        - type: object
+          properties:
+            exam:
+              $ref: '#/components/schemas/Exam'
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/ResultQuestionDetail'
+
+    AdminResultItem:
+      allOf:
+        - $ref: '#/components/schemas/Result'
+        - type: object
+          properties:
+            examTitle:
+              type: string
+              nullable: true
+            studentName:
+              type: string
+              nullable: true
+            username:
+              type: string
+              nullable: true
+            pass:
+              type: boolean
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalItems:
+          type: integer
+        totalPages:
+          type: integer
+
+    AdminResultsResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/AdminResultItem'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    StatsDistribution:
+      type: object
+      properties:
+        below3:
+          type: integer
+        from3to5:
+          type: integer
+        from5to7:
+          type: integer
+        from7to9:
+          type: integer
+        aboveOrEqual9:
+          type: integer
+
+    StatsSummary:
+      type: object
+      properties:
+        totalAttempts:
+          type: integer
+        avgScore:
+          type: number
+        passRate:
+          type: number
+        distribution:
+          $ref: '#/components/schemas/StatsDistribution'
+
+    StudentJourneyResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        data:
+          type: object
+          properties:
+            student:
+              $ref: '#/components/schemas/User'
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/AdminResultItem'
+
+    AdminDetailedResultQuestion:
+      type: object
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        explanation:
+          type: string
+        correctOptionId:
+          type: string
+        selectedOptionId:
+          type: string
+          nullable: true
+        isCorrect:
+          type: boolean
+
+    AdminDetailedResult:
+      allOf:
+        - $ref: '#/components/schemas/Result'
+        - type: object
+          properties:
+            exam:
+              $ref: '#/components/schemas/Exam'
+            questions:
+              type: array
+              items:
+                $ref: '#/components/schemas/AdminDetailedResultQuestion'
