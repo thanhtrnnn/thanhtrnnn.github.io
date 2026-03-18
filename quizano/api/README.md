@@ -1,8 +1,16 @@
 # Quizano Node.js API
 
-SQLite database file default: `src/data/quizano.sqlite`
+Storage: SQL Server
 
-You can override database path with env var `SQLITE_FILE`.
+You can configure database connection via:
+
+- `SQLSERVER_HOST`
+- `SQLSERVER_PORT`
+- `SQLSERVER_DATABASE`
+- `SQLSERVER_USER`
+- `SQLSERVER_PASSWORD`
+- `SQLSERVER_ENCRYPT`
+- `SQLSERVER_TRUST_CERT`
 
 Base URL: `http://localhost:8080/api/v1`
 

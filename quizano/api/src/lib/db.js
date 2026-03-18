@@ -1,10 +1,9 @@
 import * as fs from 'fs/promises';
-import path from 'path';
-import { DatabaseSync } from 'node:sqlite';
-import { sqliteFilePath, legacyJsonFilePath } from '../config.js';
+import sql from 'mssql';
+import { legacyJsonFilePath, sqlServerConfig } from '../config.js';
 import { seedData } from '../data/seedData.js';
 
-let connection;
+let poolPromise;
 let writeQueue = Promise.resolve();
 
 function normalizeDb(payload) {
@@ -17,75 +16,123 @@ function normalizeDb(payload) {
   };
 }
 
-function openConnection() {
-  if (!connection) {
-    connection = new DatabaseSync(sqliteFilePath);
-    connection.exec('PRAGMA foreign_keys = ON');
-  }
-  return connection;
+function buildMasterConfig() {
+  return {
+    ...sqlServerConfig,
+    database: 'master'
+  };
 }
 
-function createSchema(db) {
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-      id TEXT PRIMARY KEY,
-      username TEXT NOT NULL UNIQUE,
-      full_name TEXT NOT NULL,
-      email TEXT NOT NULL UNIQUE,
-      password TEXT NOT NULL,
-      role TEXT NOT NULL CHECK (role IN ('admin', 'student'))
-    );
+async function ensureDatabaseExists() {
+  const masterPool = await new sql.ConnectionPool(buildMasterConfig()).connect();
+  try {
+    const request = masterPool.request();
+    request.input('databaseName', sql.NVarChar(128), sqlServerConfig.database);
+    await request.query(`
+      IF DB_ID(@databaseName) IS NULL
+      BEGIN
+        DECLARE @escapedName NVARCHAR(260) = REPLACE(@databaseName, ']', ']]');
+        DECLARE @statement NVARCHAR(MAX) = N'CREATE DATABASE [' + @escapedName + N']';
+        EXEC(@statement);
+      END
+    `);
+  } finally {
+    await masterPool.close();
+  }
+}
 
-    CREATE TABLE IF NOT EXISTS exams (
-      id TEXT PRIMARY KEY,
-      title TEXT NOT NULL,
-      description TEXT NOT NULL,
-      type TEXT NOT NULL CHECK (type IN ('free', 'scheduled')),
-      start_time TEXT,
-      end_time TEXT,
-      duration INTEGER NOT NULL,
-      status TEXT NOT NULL CHECK (status IN ('active', 'inactive'))
-    );
+async function getPool() {
+  if (!poolPromise) {
+    poolPromise = (async () => {
+      await ensureDatabaseExists();
+      return new sql.ConnectionPool(sqlServerConfig).connect();
+    })().catch((error) => {
+      poolPromise = undefined;
+      throw error;
+    });
+  }
+  return poolPromise;
+}
 
-    CREATE TABLE IF NOT EXISTS questions (
-      id TEXT PRIMARY KEY,
-      exam_id TEXT NOT NULL,
-      content TEXT NOT NULL,
-      correct_option_id TEXT NOT NULL,
-      explanation TEXT NOT NULL DEFAULT '',
-      FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE
-    );
+async function createSchema(pool) {
+  await pool.request().query(`
+    IF OBJECT_ID('dbo.users', 'U') IS NULL
+    BEGIN
+      CREATE TABLE dbo.users (
+        id NVARCHAR(64) PRIMARY KEY,
+        username NVARCHAR(128) NOT NULL UNIQUE,
+        full_name NVARCHAR(255) NOT NULL,
+        email NVARCHAR(255) NOT NULL UNIQUE,
+        password NVARCHAR(255) NOT NULL,
+        role NVARCHAR(20) NOT NULL CHECK (role IN ('admin', 'student'))
+      );
+    END;
 
-    CREATE TABLE IF NOT EXISTS question_options (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      question_id TEXT NOT NULL,
-      option_id TEXT NOT NULL,
-      text TEXT NOT NULL,
-      UNIQUE(question_id, option_id),
-      FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
-    );
+    IF OBJECT_ID('dbo.exams', 'U') IS NULL
+    BEGIN
+      CREATE TABLE dbo.exams (
+        id NVARCHAR(64) PRIMARY KEY,
+        title NVARCHAR(255) NOT NULL,
+        description NVARCHAR(MAX) NOT NULL,
+        type NVARCHAR(20) NOT NULL CHECK (type IN ('free', 'scheduled')),
+        start_time DATETIME2 NULL,
+        end_time DATETIME2 NULL,
+        duration INT NOT NULL,
+        status NVARCHAR(20) NOT NULL CHECK (status IN ('active', 'inactive'))
+      );
+    END;
 
-    CREATE TABLE IF NOT EXISTS results (
-      id TEXT PRIMARY KEY,
-      student_id TEXT NOT NULL,
-      exam_id TEXT NOT NULL,
-      start_time TEXT NOT NULL,
-      submit_time TEXT NOT NULL,
-      correct_count INTEGER NOT NULL,
-      total_questions INTEGER NOT NULL,
-      score REAL NOT NULL,
-      status TEXT NOT NULL,
-      FOREIGN KEY (student_id) REFERENCES users(id),
-      FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE
-    );
+    IF OBJECT_ID('dbo.questions', 'U') IS NULL
+    BEGIN
+      CREATE TABLE dbo.questions (
+        id NVARCHAR(64) PRIMARY KEY,
+        exam_id NVARCHAR(64) NOT NULL,
+        content NVARCHAR(MAX) NOT NULL,
+        correct_option_id NVARCHAR(64) NOT NULL,
+        explanation NVARCHAR(MAX) NOT NULL DEFAULT N'',
+        CONSTRAINT FK_questions_exam FOREIGN KEY (exam_id) REFERENCES dbo.exams(id) ON DELETE CASCADE
+      );
+    END;
 
-    CREATE TABLE IF NOT EXISTS result_answers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      result_id TEXT NOT NULL,
-      question_id TEXT NOT NULL,
-      selected_option_id TEXT,
-      FOREIGN KEY (result_id) REFERENCES results(id) ON DELETE CASCADE
-    );
+    IF OBJECT_ID('dbo.question_options', 'U') IS NULL
+    BEGIN
+      CREATE TABLE dbo.question_options (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        question_id NVARCHAR(64) NOT NULL,
+        option_id NVARCHAR(64) NOT NULL,
+        [text] NVARCHAR(MAX) NOT NULL,
+        CONSTRAINT UQ_question_options UNIQUE(question_id, option_id),
+        CONSTRAINT FK_question_options_question FOREIGN KEY (question_id) REFERENCES dbo.questions(id) ON DELETE CASCADE
+      );
+    END;
+
+    IF OBJECT_ID('dbo.results', 'U') IS NULL
+    BEGIN
+      CREATE TABLE dbo.results (
+        id NVARCHAR(64) PRIMARY KEY,
+        student_id NVARCHAR(64) NOT NULL,
+        exam_id NVARCHAR(64) NOT NULL,
+        start_time DATETIME2 NOT NULL,
+        submit_time DATETIME2 NOT NULL,
+        correct_count INT NOT NULL,
+        total_questions INT NOT NULL,
+        score DECIMAL(5,2) NOT NULL,
+        status NVARCHAR(32) NOT NULL,
+        CONSTRAINT FK_results_student FOREIGN KEY (student_id) REFERENCES dbo.users(id),
+        CONSTRAINT FK_results_exam FOREIGN KEY (exam_id) REFERENCES dbo.exams(id) ON DELETE CASCADE
+      );
+    END;
+
+    IF OBJECT_ID('dbo.result_answers', 'U') IS NULL
+    BEGIN
+      CREATE TABLE dbo.result_answers (
+        id INT IDENTITY(1,1) PRIMARY KEY,
+        result_id NVARCHAR(64) NOT NULL,
+        question_id NVARCHAR(64) NOT NULL,
+        selected_option_id NVARCHAR(64) NULL,
+        CONSTRAINT FK_result_answers_result FOREIGN KEY (result_id) REFERENCES dbo.results(id) ON DELETE CASCADE
+      );
+    END;
   `);
 }
 
@@ -98,104 +145,150 @@ async function readLegacyJsonData() {
   }
 }
 
-function replaceDbData(db, payload) {
-  const normalized = normalizeDb(payload);
+async function insertUser(transaction, user) {
+  const request = new sql.Request(transaction);
+  request.input('id', sql.NVarChar(64), String(user.id));
+  request.input('username', sql.NVarChar(128), String(user.username));
+  request.input('fullName', sql.NVarChar(255), String(user.fullName));
+  request.input('email', sql.NVarChar(255), String(user.email));
+  request.input('password', sql.NVarChar(255), String(user.password));
+  request.input('role', sql.NVarChar(20), String(user.role));
+  await request.query(`
+    INSERT INTO dbo.users (id, username, full_name, email, password, role)
+    VALUES (@id, @username, @fullName, @email, @password, @role)
+  `);
+}
 
-  db.exec('BEGIN IMMEDIATE');
+async function insertExam(transaction, exam) {
+  const request = new sql.Request(transaction);
+  request.input('id', sql.NVarChar(64), String(exam.id));
+  request.input('title', sql.NVarChar(255), String(exam.title));
+  request.input('description', sql.NVarChar(sql.MAX), String(exam.description));
+  request.input('type', sql.NVarChar(20), String(exam.type));
+  request.input('startTime', sql.DateTime2, exam.startTime ? new Date(exam.startTime) : null);
+  request.input('endTime', sql.DateTime2, exam.endTime ? new Date(exam.endTime) : null);
+  request.input('duration', sql.Int, Number(exam.duration));
+  request.input('status', sql.NVarChar(20), String(exam.status));
+  await request.query(`
+    INSERT INTO dbo.exams (id, title, description, type, start_time, end_time, duration, status)
+    VALUES (@id, @title, @description, @type, @startTime, @endTime, @duration, @status)
+  `);
+}
+
+async function insertQuestion(transaction, question) {
+  const request = new sql.Request(transaction);
+  request.input('id', sql.NVarChar(64), String(question.id));
+  request.input('examId', sql.NVarChar(64), String(question.examId));
+  request.input('content', sql.NVarChar(sql.MAX), String(question.content));
+  request.input('correctOptionId', sql.NVarChar(64), String(question.correctOptionId));
+  request.input('explanation', sql.NVarChar(sql.MAX), String(question.explanation || ''));
+  await request.query(`
+    INSERT INTO dbo.questions (id, exam_id, content, correct_option_id, explanation)
+    VALUES (@id, @examId, @content, @correctOptionId, @explanation)
+  `);
+
+  const options = Array.isArray(question.options) ? question.options : [];
+  for (const option of options) {
+    const optionRequest = new sql.Request(transaction);
+    optionRequest.input('questionId', sql.NVarChar(64), String(question.id));
+    optionRequest.input('optionId', sql.NVarChar(64), String(option.id));
+    optionRequest.input('text', sql.NVarChar(sql.MAX), String(option.text));
+    await optionRequest.query(`
+      INSERT INTO dbo.question_options (question_id, option_id, [text])
+      VALUES (@questionId, @optionId, @text)
+    `);
+  }
+}
+
+async function insertResult(transaction, result) {
+  const request = new sql.Request(transaction);
+  request.input('id', sql.NVarChar(64), String(result.id));
+  request.input('studentId', sql.NVarChar(64), String(result.studentId));
+  request.input('examId', sql.NVarChar(64), String(result.examId));
+  request.input('startTime', sql.DateTime2, new Date(result.startTime));
+  request.input('submitTime', sql.DateTime2, new Date(result.submitTime));
+  request.input('correctCount', sql.Int, Number(result.correctCount || 0));
+  request.input('totalQuestions', sql.Int, Number(result.totalQuestions || 0));
+  request.input('score', sql.Decimal(5, 2), Number(result.score || 0));
+  request.input('status', sql.NVarChar(32), String(result.status || 'completed'));
+  await request.query(`
+    INSERT INTO dbo.results (id, student_id, exam_id, start_time, submit_time, correct_count, total_questions, score, status)
+    VALUES (@id, @studentId, @examId, @startTime, @submitTime, @correctCount, @totalQuestions, @score, @status)
+  `);
+
+  const answers = Array.isArray(result.answers) ? result.answers : [];
+  for (const answer of answers) {
+    const answerRequest = new sql.Request(transaction);
+    answerRequest.input('resultId', sql.NVarChar(64), String(result.id));
+    answerRequest.input('questionId', sql.NVarChar(64), String(answer.questionId));
+    answerRequest.input('selectedOptionId', sql.NVarChar(64), answer.selectedOptionId || null);
+    await answerRequest.query(`
+      INSERT INTO dbo.result_answers (result_id, question_id, selected_option_id)
+      VALUES (@resultId, @questionId, @selectedOptionId)
+    `);
+  }
+}
+
+async function replaceDbData(pool, payload) {
+  const normalized = normalizeDb(payload);
+  const transaction = new sql.Transaction(pool);
+
+  await transaction.begin();
   try {
-    db.exec(`
-      DELETE FROM result_answers;
-      DELETE FROM results;
-      DELETE FROM question_options;
-      DELETE FROM questions;
-      DELETE FROM exams;
-      DELETE FROM users;
+    await new sql.Request(transaction).query(`
+      DELETE FROM dbo.result_answers;
+      DELETE FROM dbo.results;
+      DELETE FROM dbo.question_options;
+      DELETE FROM dbo.questions;
+      DELETE FROM dbo.exams;
+      DELETE FROM dbo.users;
     `);
 
-    const insertUser = db.prepare('INSERT INTO users (id, username, full_name, email, password, role) VALUES (?, ?, ?, ?, ?, ?)');
-    const insertExam = db.prepare('INSERT INTO exams (id, title, description, type, start_time, end_time, duration, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-    const insertQuestion = db.prepare('INSERT INTO questions (id, exam_id, content, correct_option_id, explanation) VALUES (?, ?, ?, ?, ?)');
-    const insertOption = db.prepare('INSERT INTO question_options (question_id, option_id, text) VALUES (?, ?, ?)');
-    const insertResult = db.prepare('INSERT INTO results (id, student_id, exam_id, start_time, submit_time, correct_count, total_questions, score, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
-    const insertAnswer = db.prepare('INSERT INTO result_answers (result_id, question_id, selected_option_id) VALUES (?, ?, ?)');
-
     for (const user of normalized.users) {
-      insertUser.run(user.id, user.username, user.fullName, user.email, user.password, user.role);
+      await insertUser(transaction, user);
     }
 
     for (const exam of normalized.exams) {
-      insertExam.run(
-        exam.id,
-        exam.title,
-        exam.description,
-        exam.type,
-        exam.startTime || null,
-        exam.endTime || null,
-        Number(exam.duration),
-        exam.status
-      );
+      await insertExam(transaction, exam);
     }
 
     for (const question of normalized.questions) {
-      insertQuestion.run(
-        question.id,
-        question.examId,
-        question.content,
-        question.correctOptionId,
-        question.explanation || ''
-      );
-
-      const options = Array.isArray(question.options) ? question.options : [];
-      for (const option of options) {
-        insertOption.run(question.id, option.id, option.text);
-      }
+      await insertQuestion(transaction, question);
     }
 
     for (const result of normalized.results) {
-      insertResult.run(
-        result.id,
-        result.studentId,
-        result.examId,
-        result.startTime,
-        result.submitTime,
-        Number(result.correctCount || 0),
-        Number(result.totalQuestions || 0),
-        Number(result.score || 0),
-        result.status || 'completed'
-      );
-
-      const answers = Array.isArray(result.answers) ? result.answers : [];
-      for (const answer of answers) {
-        insertAnswer.run(result.id, answer.questionId, answer.selectedOptionId || null);
-      }
+      await insertResult(transaction, result);
     }
-    db.exec('COMMIT');
+
+    await transaction.commit();
   } catch (error) {
-    db.exec('ROLLBACK');
+    try {
+      await transaction.rollback();
+    } catch (_rollbackError) {
+      // Ignore rollback errors to preserve original failure context.
+    }
     throw error;
   }
 
   return normalized;
 }
 
-async function seedIfEmpty(db) {
-  const row = db.prepare('SELECT COUNT(1) AS count FROM users').get();
-  const count = Number(row?.count || 0);
+async function seedIfEmpty(pool) {
+  const response = await pool.request().query('SELECT COUNT(1) AS [count] FROM dbo.users');
+  const count = Number(response.recordset?.[0]?.count || 0);
   if (count > 0) {
     return;
   }
 
   const legacyData = await readLegacyJsonData();
   const initialData = legacyData || seedData();
-  replaceDbData(db, initialData);
+  await replaceDbData(pool, initialData);
 }
 
 async function ensureDb() {
-  const dir = path.dirname(sqliteFilePath);
-  await fs.mkdir(dir, { recursive: true });
-  const db = openConnection();
-  createSchema(db);
-  await seedIfEmpty(db);
+  const pool = await getPool();
+  await createSchema(pool);
+  await seedIfEmpty(pool);
 }
 
 function mapQuestions(rows) {
@@ -252,12 +345,14 @@ function mapResults(rows) {
 
 async function readDb() {
   await ensureDb();
-  const db = openConnection();
+  const pool = await getPool();
 
-  const users = db
-    .prepare('SELECT id, username, full_name, email, password, role FROM users ORDER BY id')
-    .all()
-    .map((row) => ({
+  const userRows = await pool.request().query(`
+    SELECT id, username, full_name, email, password, role
+    FROM dbo.users
+    ORDER BY id
+  `);
+  const users = userRows.recordset.map((row) => ({
       id: row.id,
       username: row.username,
       fullName: row.full_name,
@@ -266,21 +361,23 @@ async function readDb() {
       role: row.role
     }));
 
-  const exams = db
-    .prepare('SELECT id, title, description, type, start_time, end_time, duration, status FROM exams ORDER BY id')
-    .all()
-    .map((row) => ({
+  const examRows = await pool.request().query(`
+    SELECT id, title, description, type, start_time, end_time, duration, status
+    FROM dbo.exams
+    ORDER BY id
+  `);
+  const exams = examRows.recordset.map((row) => ({
       id: row.id,
       title: row.title,
       description: row.description,
       type: row.type,
-      startTime: row.start_time || undefined,
-      endTime: row.end_time || undefined,
+      startTime: row.start_time ? new Date(row.start_time).toISOString() : undefined,
+      endTime: row.end_time ? new Date(row.end_time).toISOString() : undefined,
       duration: Number(row.duration),
       status: row.status
     }));
 
-  const questionRows = db.prepare(`
+  const questionRowsResponse = await pool.request().query(`
     SELECT
       q.id,
       q.exam_id,
@@ -288,14 +385,15 @@ async function readDb() {
       q.correct_option_id,
       q.explanation,
       qo.option_id,
-      qo.text AS option_text,
+      qo.[text] AS option_text,
       qo.id AS option_row_id
-    FROM questions q
-    LEFT JOIN question_options qo ON qo.question_id = q.id
+    FROM dbo.questions q
+    LEFT JOIN dbo.question_options qo ON qo.question_id = q.id
     ORDER BY q.id, qo.id
-  `).all();
+  `);
+  const questionRows = questionRowsResponse.recordset;
 
-  const resultRows = db.prepare(`
+  const resultRowsResponse = await pool.request().query(`
     SELECT
       r.id,
       r.student_id,
@@ -309,10 +407,11 @@ async function readDb() {
       ra.question_id,
       ra.selected_option_id,
       ra.id AS answer_row_id
-    FROM results r
-    LEFT JOIN result_answers ra ON ra.result_id = r.id
+    FROM dbo.results r
+    LEFT JOIN dbo.result_answers ra ON ra.result_id = r.id
     ORDER BY r.id, ra.id
-  `).all();
+  `);
+  const resultRows = resultRowsResponse.recordset;
 
   return normalizeDb({
     users,
@@ -324,11 +423,11 @@ async function readDb() {
 
 async function writeDb(payload) {
   await ensureDb();
-  const db = openConnection();
+  const pool = await getPool();
   const normalized = normalizeDb(payload);
   writeQueue = writeQueue
     .catch(() => undefined)
-    .then(() => replaceDbData(db, normalized));
+    .then(() => replaceDbData(pool, normalized));
   await writeQueue;
   return normalized;
 }
