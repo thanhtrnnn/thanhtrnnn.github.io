@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: Node.js API for a simplified Quizano app with student and admin flows.
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:8086
 tags:
   - name: Health
     description: Service status
@@ -19,7 +19,7 @@ tags:
   - name: Admin
     description: Admin reports and statistics
 paths:
-  /api/v1/health:
+  /api/health:
     get:
       tags: [Health]
       summary: Health check
@@ -39,7 +39,7 @@ paths:
                 ok: true
                 service: quizano-api
 
-  /api/v1/auth/register:
+  /api/auth/register:
     post:
       tags: [Auth]
       summary: Register student account
@@ -67,7 +67,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
 
-  /api/v1/auth/login:
+  /api/auth/login:
     post:
       tags: [Auth]
       summary: Login
@@ -94,7 +94,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /api/v1/auth/me:
+  /api/auth/me:
     get:
       tags: [Auth]
       summary: Current user profile
@@ -115,7 +115,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /api/v1/users:
+  /api/users:
     get:
       tags: [Users]
       summary: List users
@@ -151,7 +151,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
-  /api/v1/users/students:
+  /api/users/students:
     post:
       tags: [Users]
       summary: Create student user
@@ -163,11 +163,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateStudentRequest'
-            example:
-              fullName: "Tran Thi B"
-              username: "tranthib"
-              email: "tranthib@gmail.com"
-              password: "123"
       responses:
         '201':
           description: Student created
@@ -187,7 +182,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
 
-  /api/v1/users/{userId}:
+  /api/users/{userId}:
     put:
       tags: [Users]
       summary: Update user profile
@@ -206,10 +201,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateUserRequest'
-            example:
-              fullName: "Nguyen Van A (Edited)"
-              email: "nguyenvana_edited@gmail.com"
-              password: "newpassword123"
       responses:
         '200':
           description: User updated
@@ -260,7 +251,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /api/v1/exams:
+  /api/exams:
     get:
       tags: [Exams]
       summary: List exams
@@ -312,15 +303,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateExamRequest'
-            example:
-              title: "Thi thử môn CSDL"
-              description: "Bài thi thử số 1"
-              type: "scheduled"
-              duration: 45
-              status: "active"
-              startTime: "2026-03-25T08:00:00.000Z"
-              endTime: "2026-03-25T09:30:00.000Z"
-              questions: []
       responses:
         '201':
           description: Created exam
@@ -345,7 +327,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
 
-  /api/v1/exams/{examId}:
+  /api/exams/{examId}:
     get:
       tags: [Exams]
       summary: Get exam by id
@@ -391,12 +373,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateExamRequest'
-            example:
-              title: "Thi thử môn CSDL (Đã cập nhật)"
-              description: "Bài thi thử số 1"
-              type: "free"
-              duration: 60
-              status: "inactive"
       responses:
         '200':
           description: Updated exam
@@ -444,7 +420,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /api/v1/exams/{examId}/questions:
+  /api/exams/{examId}/questions:
     get:
       tags: [Exams]
       summary: Get questions by exam
@@ -504,20 +480,6 @@ paths:
                   type: array
                   items:
                     $ref: '#/components/schemas/QuestionInput'
-            example:
-              questions:
-                - content: "Thủ đô của Việt Nam là gì?"
-                  options:
-                    - id: "A"
-                      text: "Hồ Chí Minh"
-                    - id: "B"
-                      text: "Đà Nẵng"
-                    - id: "C"
-                      text: "Hà Nội"
-                    - id: "D"
-                      text: "Hải Phòng"
-                  correctOptionId: "C"
-                  explanation: "Hà Nội là thủ đô của VN."
       responses:
         '200':
           description: Questions replaced
@@ -536,7 +498,7 @@ paths:
                       questionsCount:
                         type: integer
 
-  /api/v1/exams/{examId}/questions/import:
+  /api/exams/{examId}/questions/import:
     post:
       tags: [Exams]
       summary: Import questions from row payload
@@ -555,15 +517,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ImportQuestionsRequest'
-            example:
-              rows:
-                - question: "Biển Đông thuộc đại dương nào?"
-                  optionA: "Thái Bình Dương"
-                  optionB: "Đại Tây Dương"
-                  optionC: "Bắc Băng Dương"
-                  optionD: "Ấn Độ Dương"
-                  correctOption: "A"
-                  explanation: "Kiến thức địa lý cơ bản"
       responses:
         '200':
           description: Import completed
@@ -582,7 +535,7 @@ paths:
                       examId:
                         type: string
 
-  /api/v1/results/submit:
+  /api/results/submit:
     post:
       tags: [Results]
       summary: Submit exam answers
@@ -595,14 +548,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SubmitResultRequest'
-            example:
-              examId: "exam_12345"
-              startTime: "2026-03-20T08:00:00.000Z"
-              answers:
-                - questionId: "q_001"
-                  selectedOptionId: "A"
-                - questionId: "q_002"
-                  selectedOptionId: "C"
       responses:
         '201':
           description: Submission accepted and graded
@@ -634,7 +579,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /api/v1/results/me:
+  /api/results/me:
     get:
       tags: [Results]
       summary: List current student's results
@@ -660,7 +605,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/Result'
 
-  /api/v1/results/me/latest:
+  /api/results/me/latest:
     get:
       tags: [Results]
       summary: Latest result of current student
@@ -681,7 +626,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /api/v1/results/{resultId}:
+  /api/results/{resultId}:
     get:
       tags: [Results]
       summary: Get result by id
@@ -717,7 +662,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /api/v1/admin/results:
+  /api/admin/results:
     get:
       tags: [Admin]
       summary: Query result records with pagination
@@ -761,7 +706,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AdminResultsResponse'
 
-  /api/v1/admin/stats/summary:
+  /api/admin/stats/summary:
     get:
       tags: [Admin]
       summary: Score summary and distribution
@@ -785,7 +730,7 @@ paths:
                   data:
                     $ref: '#/components/schemas/StatsSummary'
 
-  /api/v1/admin/students/{studentId}/journey:
+  /api/admin/students/{studentId}/journey:
     get:
       tags: [Admin]
       summary: Student exam journey
@@ -807,7 +752,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /api/v1/admin/students/{studentId}/results/{resultId}:
+  /api/admin/students/{studentId}/results/{resultId}:
     get:
       tags: [Admin]
       summary: Admin view detailed result of one student
@@ -972,11 +917,6 @@ components:
     CreateStudentRequest:
       allOf:
         - $ref: '#/components/schemas/RegisterRequest'
-      example:
-        fullName: "Tran Thi B"
-        username: "tranthib"
-        email: "tranthib@gmail.com"
-        password: "123"
 
     UpdateUserRequest:
       type: object
@@ -988,10 +928,6 @@ components:
           format: email
         password:
           type: string
-      example:
-        fullName: "Nguyen Van A (Edited)"
-        email: "nguyenvana_edited@gmail.com"
-        password: "newpassword123"
 
     Exam:
       type: object
@@ -1053,19 +989,6 @@ components:
           type: string
         explanation:
           type: string
-      example:
-        content: "1 + 1 bằng mấy?"
-        options:
-          - id: "A"
-            text: "1"
-          - id: "B"
-            text: "2"
-          - id: "C"
-            text: "3"
-          - id: "D"
-            text: "4"
-        correctOptionId: "B"
-        explanation: "1 cộng 1 bằng 2"
 
     Question:
       allOf:
@@ -1117,25 +1040,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/QuestionInput'
-      example:
-        title: "Thi thử môn CSDL"
-        description: "Bài thi thử số 1"
-        type: "scheduled"
-        duration: 45
-        status: "active"
-        startTime: "2026-03-25T08:00:00.000Z"
-        endTime: "2026-03-25T09:30:00.000Z"
-        questions: []
 
     UpdateExamRequest:
       allOf:
         - $ref: '#/components/schemas/CreateExamRequest'
-      example:
-        title: "Thi thử môn CSDL (Đã cập nhật)"
-        description: "Bài thi thử số 1"
-        type: "free"
-        duration: 60
-        status: "inactive"
 
     ImportQuestionRow:
       type: object
@@ -1164,15 +1072,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ImportQuestionRow'
-      example:
-        rows:
-          - question: "Biển Đông thuộc đại dương nào?"
-            optionA: "Thái Bình Dương"
-            optionB: "Đại Tây Dương"
-            optionC: "Bắc Băng Dương"
-            optionD: "Ấn Độ Dương"
-            correctOption: "A"
-            explanation: "Kiến thức địa lý cơ bản"
 
     AnswerInput:
       type: object
@@ -1197,14 +1096,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnswerInput'
-      example:
-        examId: "exam_12345"
-        startTime: "2026-03-20T08:00:00.000Z"
-        answers:
-          - questionId: "q_001"
-            selectedOptionId: "A"
-          - questionId: "q_002"
-            selectedOptionId: "C"
 
     Result:
       type: object

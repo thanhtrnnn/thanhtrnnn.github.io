@@ -1,12 +1,13 @@
-import * as fs from 'fs/promises';
+import fs from 'fs/promises';
 import sql from 'mssql';
-import { legacyJsonFilePath, sqlServerConfig } from '../config.js';
-import { seedData } from '../data/seedData.js';
+import { legacyJsonFilePath, sqlServerConfig } from '../config';
+import { seedData } from '../data/seedData';
+import { DbPayload, Exam, Question, Result, User } from '../types';
 
-let poolPromise;
-let writeQueue = Promise.resolve();
+let poolPromise: Promise<sql.ConnectionPool> | undefined;
+let writeQueue = Promise.resolve<DbPayload | undefined>(undefined);
 
-function normalizeDb(payload) {
+function normalizeDb(payload: Partial<DbPayload> | null | undefined): DbPayload {
   const src = payload || {};
   return {
     users: Array.isArray(src.users) ? src.users : [],
@@ -16,18 +17,18 @@ function normalizeDb(payload) {
   };
 }
 
-function buildMasterConfig() {
+function buildMasterConfig(): sql.config {
   return {
     ...sqlServerConfig,
     database: 'master'
-  };
+  } as sql.config;
 }
 
-async function ensureDatabaseExists() {
+async function ensureDatabaseExists(): Promise<void> {
   const masterPool = await new sql.ConnectionPool(buildMasterConfig()).connect();
   try {
     const request = masterPool.request();
-    request.input('databaseName', sql.NVarChar(128), sqlServerConfig.database);
+    request.input('databaseName', sql.NVarChar(128), String(sqlServerConfig.database));
     await request.query(`
       IF DB_ID(@databaseName) IS NULL
       BEGIN
@@ -41,11 +42,11 @@ async function ensureDatabaseExists() {
   }
 }
 
-async function getPool() {
+export async function getPool(): Promise<sql.ConnectionPool> {
   if (!poolPromise) {
     poolPromise = (async () => {
       await ensureDatabaseExists();
-      return new sql.ConnectionPool(sqlServerConfig).connect();
+      return new sql.ConnectionPool(sqlServerConfig as sql.config).connect();
     })().catch((error) => {
       poolPromise = undefined;
       throw error;
@@ -54,7 +55,7 @@ async function getPool() {
   return poolPromise;
 }
 
-async function createSchema(pool) {
+async function createSchema(pool: sql.ConnectionPool): Promise<void> {
   await pool.request().query(`
     IF OBJECT_ID('dbo.users', 'U') IS NULL
     BEGIN
@@ -136,16 +137,16 @@ async function createSchema(pool) {
   `);
 }
 
-async function readLegacyJsonData() {
+async function readLegacyJsonData(): Promise<DbPayload | null> {
   try {
     const raw = await fs.readFile(legacyJsonFilePath, 'utf8');
     return normalizeDb(JSON.parse(raw));
-  } catch (_error) {
+  } catch {
     return null;
   }
 }
 
-async function insertUser(transaction, user) {
+async function insertUser(transaction: sql.Transaction, user: User): Promise<void> {
   const request = new sql.Request(transaction);
   request.input('id', sql.NVarChar(64), String(user.id));
   request.input('username', sql.NVarChar(128), String(user.username));
@@ -159,7 +160,7 @@ async function insertUser(transaction, user) {
   `);
 }
 
-async function insertExam(transaction, exam) {
+async function insertExam(transaction: sql.Transaction, exam: Exam): Promise<void> {
   const request = new sql.Request(transaction);
   request.input('id', sql.NVarChar(64), String(exam.id));
   request.input('title', sql.NVarChar(255), String(exam.title));
@@ -175,7 +176,7 @@ async function insertExam(transaction, exam) {
   `);
 }
 
-async function insertQuestion(transaction, question) {
+async function insertQuestion(transaction: sql.Transaction, question: Question): Promise<void> {
   const request = new sql.Request(transaction);
   request.input('id', sql.NVarChar(64), String(question.id));
   request.input('examId', sql.NVarChar(64), String(question.examId));
@@ -200,7 +201,7 @@ async function insertQuestion(transaction, question) {
   }
 }
 
-async function insertResult(transaction, result) {
+async function insertResult(transaction: sql.Transaction, result: Result): Promise<void> {
   const request = new sql.Request(transaction);
   request.input('id', sql.NVarChar(64), String(result.id));
   request.input('studentId', sql.NVarChar(64), String(result.studentId));
@@ -229,7 +230,7 @@ async function insertResult(transaction, result) {
   }
 }
 
-async function replaceDbData(pool, payload) {
+async function replaceDbData(pool: sql.ConnectionPool, payload: Partial<DbPayload>): Promise<DbPayload> {
   const normalized = normalizeDb(payload);
   const transaction = new sql.Transaction(pool);
 
@@ -247,15 +248,12 @@ async function replaceDbData(pool, payload) {
     for (const user of normalized.users) {
       await insertUser(transaction, user);
     }
-
     for (const exam of normalized.exams) {
       await insertExam(transaction, exam);
     }
-
     for (const question of normalized.questions) {
       await insertQuestion(transaction, question);
     }
-
     for (const result of normalized.results) {
       await insertResult(transaction, result);
     }
@@ -264,8 +262,8 @@ async function replaceDbData(pool, payload) {
   } catch (error) {
     try {
       await transaction.rollback();
-    } catch (_rollbackError) {
-      // Ignore rollback errors to preserve original failure context.
+    } catch {
+      // Ignore rollback errors to preserve original context.
     }
     throw error;
   }
@@ -273,7 +271,7 @@ async function replaceDbData(pool, payload) {
   return normalized;
 }
 
-async function seedIfEmpty(pool) {
+async function seedIfEmpty(pool: sql.ConnectionPool): Promise<void> {
   const response = await pool.request().query('SELECT COUNT(1) AS [count] FROM dbo.users');
   const count = Number(response.recordset?.[0]?.count || 0);
   if (count > 0) {
@@ -285,14 +283,14 @@ async function seedIfEmpty(pool) {
   await replaceDbData(pool, initialData);
 }
 
-async function ensureDb() {
+export async function ensureDb(): Promise<void> {
   const pool = await getPool();
   await createSchema(pool);
   await seedIfEmpty(pool);
 }
 
-function mapQuestions(rows) {
-  const map = new Map();
+function mapQuestions(rows: any[]): Question[] {
+  const map = new Map<string, Question>();
   for (const row of rows) {
     if (!map.has(row.id)) {
       map.set(row.id, {
@@ -306,7 +304,7 @@ function mapQuestions(rows) {
     }
 
     if (row.option_id !== null && row.option_id !== undefined) {
-      map.get(row.id).options.push({
+      map.get(row.id)?.options.push({
         id: row.option_id,
         text: row.option_text
       });
@@ -315,8 +313,8 @@ function mapQuestions(rows) {
   return Array.from(map.values());
 }
 
-function mapResults(rows) {
-  const map = new Map();
+function mapResults(rows: any[]): Result[] {
+  const map = new Map<string, Result>();
   for (const row of rows) {
     if (!map.has(row.id)) {
       map.set(row.id, {
@@ -334,7 +332,7 @@ function mapResults(rows) {
     }
 
     if (row.question_id !== null && row.question_id !== undefined) {
-      map.get(row.id).answers.push({
+      map.get(row.id)?.answers.push({
         questionId: row.question_id,
         selectedOptionId: row.selected_option_id
       });
@@ -343,7 +341,7 @@ function mapResults(rows) {
   return Array.from(map.values());
 }
 
-async function readDb() {
+export async function readDb(): Promise<DbPayload> {
   await ensureDb();
   const pool = await getPool();
 
@@ -352,30 +350,30 @@ async function readDb() {
     FROM dbo.users
     ORDER BY id
   `);
-  const users = userRows.recordset.map((row) => ({
-      id: row.id,
-      username: row.username,
-      fullName: row.full_name,
-      email: row.email,
-      password: row.password,
-      role: row.role
-    }));
+  const users: User[] = userRows.recordset.map((row) => ({
+    id: row.id,
+    username: row.username,
+    fullName: row.full_name,
+    email: row.email,
+    password: row.password,
+    role: row.role
+  }));
 
   const examRows = await pool.request().query(`
     SELECT id, title, description, type, start_time, end_time, duration, status
     FROM dbo.exams
     ORDER BY id
   `);
-  const exams = examRows.recordset.map((row) => ({
-      id: row.id,
-      title: row.title,
-      description: row.description,
-      type: row.type,
-      startTime: row.start_time ? new Date(row.start_time).toISOString() : undefined,
-      endTime: row.end_time ? new Date(row.end_time).toISOString() : undefined,
-      duration: Number(row.duration),
-      status: row.status
-    }));
+  const exams: Exam[] = examRows.recordset.map((row) => ({
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    type: row.type,
+    startTime: row.start_time ? new Date(row.start_time).toISOString() : undefined,
+    endTime: row.end_time ? new Date(row.end_time).toISOString() : undefined,
+    duration: Number(row.duration),
+    status: row.status
+  }));
 
   const questionRowsResponse = await pool.request().query(`
     SELECT
@@ -391,7 +389,6 @@ async function readDb() {
     LEFT JOIN dbo.question_options qo ON qo.question_id = q.id
     ORDER BY q.id, qo.id
   `);
-  const questionRows = questionRowsResponse.recordset;
 
   const resultRowsResponse = await pool.request().query(`
     SELECT
@@ -411,28 +408,29 @@ async function readDb() {
     LEFT JOIN dbo.result_answers ra ON ra.result_id = r.id
     ORDER BY r.id, ra.id
   `);
-  const resultRows = resultRowsResponse.recordset;
 
   return normalizeDb({
     users,
     exams,
-    questions: mapQuestions(questionRows),
-    results: mapResults(resultRows)
+    questions: mapQuestions(questionRowsResponse.recordset),
+    results: mapResults(resultRowsResponse.recordset)
   });
 }
 
-async function writeDb(payload) {
+export async function writeDb(payload: Partial<DbPayload>): Promise<DbPayload> {
   await ensureDb();
   const pool = await getPool();
   const normalized = normalizeDb(payload);
+
   writeQueue = writeQueue
     .catch(() => undefined)
     .then(() => replaceDbData(pool, normalized));
+
   await writeQueue;
   return normalized;
 }
 
-async function closeDbConnection() {
+export async function closeDbConnection(): Promise<void> {
   if (!poolPromise) {
     return;
   }
@@ -444,5 +442,3 @@ async function closeDbConnection() {
     await pool.close();
   }
 }
-
-export { ensureDb, readDb, writeDb, closeDbConnection };

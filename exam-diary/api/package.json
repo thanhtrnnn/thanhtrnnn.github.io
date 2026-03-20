@@ -1,0 +1,36 @@
+{
+  "name": "exam-diary-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend API for Exam Diary",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "nodemon -w src --ext ts --exec ts-node src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "db:init": "ts-node scripts/init-mssql.ts",
+    "db:seed:force": "ts-node scripts/init-mssql.ts --force"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mssql": "^11.0.1",
+    "swagger-ui-express": "^5.0.1",
+    "yaml": "^2.5.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/mssql": "^9.1.5",
+    "@types/node": "^20.14.9",
+    "@types/swagger-ui-express": "^4.1.6",
+    "nodemon": "^3.1.4",
+    "rimraf": "^5.0.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.2"
+  }
+}

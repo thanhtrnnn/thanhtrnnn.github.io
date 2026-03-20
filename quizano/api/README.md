@@ -14,7 +14,16 @@ You can configure database connection via:
 
 Base URL: `http://localhost:8080/api/v1`
 
-## Run
+## Setup Database and Run Server
+To create the database and required tables (Users, Exams, Questions, Options, Results), run the database init script:
+
+```bash
+# Initialize DB structure only
+npm run db:init
+
+# Optional: Initialize and force seed mock data
+npm run db:seed:force
+```
 
 ```bash
 npm install
