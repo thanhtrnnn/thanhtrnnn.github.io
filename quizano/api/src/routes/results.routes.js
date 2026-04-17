@@ -112,12 +112,26 @@ router.post('/submit', authorize('student'), async (req, res, next) => {
   }
 });
 
-router.get('/me', authorize('student'), async (req, res, next) => {
+router.get('/me', authorize('student', 'admin'), async (req, res, next) => {
   try {
     const examId = req.query.examId ? String(req.query.examId) : null;
+    const studentId = req.query.studentId ? String(req.query.studentId) : null;
     const db = await readDb();
 
-    let rows = db.results.filter((item) => item.studentId === req.user.id);
+    if (examId && !db.exams.find((item) => item.id === examId)) {
+      throw createError(404, 'Exam not found');
+    }
+
+    let rows;
+    if (req.user.role === 'student') {
+      rows = db.results.filter((item) => item.studentId === req.user.id);
+    } else {
+      rows = db.results;
+      if (studentId) {
+        rows = rows.filter((item) => item.studentId === studentId);
+      }
+    }
+
     if (examId) {
       rows = rows.filter((item) => item.examId === examId);
     }
@@ -136,12 +150,31 @@ router.get('/me', authorize('student'), async (req, res, next) => {
   }
 });
 
-router.get('/me/latest', authorize('student'), async (req, res, next) => {
+router.get('/me/latest', authorize('student', 'admin'), async (req, res, next) => {
   try {
+    const examId = req.query.examId ? String(req.query.examId) : null;
+    const studentId = req.query.studentId ? String(req.query.studentId) : null;
     const db = await readDb();
-    const rows = db.results
-      .filter((item) => item.studentId === req.user.id)
-      .sort((a, b) => new Date(b.submitTime).getTime() - new Date(a.submitTime).getTime());
+
+    if (examId && !db.exams.find((item) => item.id === examId)) {
+      throw createError(404, 'Exam not found');
+    }
+
+    let rows;
+    if (req.user.role === 'student') {
+      rows = db.results.filter((item) => item.studentId === req.user.id);
+    } else {
+      rows = db.results;
+      if (studentId) {
+        rows = rows.filter((item) => item.studentId === studentId);
+      }
+    }
+
+    if (examId) {
+      rows = rows.filter((item) => item.examId === examId);
+    }
+
+    rows.sort((a, b) => new Date(b.submitTime).getTime() - new Date(a.submitTime).getTime());
 
     if (rows.length === 0) {
       throw createError(404, 'No result found');

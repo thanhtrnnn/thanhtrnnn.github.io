@@ -637,12 +637,17 @@ paths:
   /api/v1/results/me:
     get:
       tags: [Results]
-      summary: List current student's results
+      summary: List student's results (self for student, filterable for admin)
+      description: Student receives own results. Admin can query by examId and optional studentId.
       security:
         - bearerAuth: []
       parameters:
         - in: query
           name: examId
+          schema:
+            type: string
+        - in: query
+          name: studentId
           schema:
             type: string
       responses:
@@ -663,9 +668,19 @@ paths:
   /api/v1/results/me/latest:
     get:
       tags: [Results]
-      summary: Latest result of current student
+      summary: Latest result (self for student, filterable for admin)
+      description: Student receives own latest result. Admin can query latest by examId and optional studentId.
       security:
         - bearerAuth: []
+      parameters:
+        - in: query
+          name: examId
+          schema:
+            type: string
+        - in: query
+          name: studentId
+          schema:
+            type: string
       responses:
         '200':
           description: Latest result

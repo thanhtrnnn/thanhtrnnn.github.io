@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang chủ</title>
+</head>
+<body style="background-color: <%= bgColor %>; color: <%= color %>; font-family: sans-serif; padding: 20px; transition: all 0.3s ease;">
+    <h1>Trang chủ</h1>
+    <p>Giao diện hiện tại: <strong><%= theme %></strong></p>
+    <p>Chọn giao diện: 
+        <a href="/set-theme/light" style="color: <%= color %>; text-decoration: underline;">Light</a> | 
+        <a href="/set-theme/dark" style="color: <%= color %>; text-decoration: underline;">Dark</a>
+    </p>
+    <hr style="border-color: <%= color %>; opacity: 0.2;"/>
+    <p>
+        <a href="/login" style="color: <%= color %>;">Đăng nhập</a> | 
+        <a href="/profile" style="color: <%= color %>;">Trang cá nhân</a> | 
+        <a href="/logout" style="color: <%= color %>;">Đăng xuất</a>
+    </p>
+</body>
+</html>

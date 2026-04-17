@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập</title>
+</head>
+<body style="font-family: sans-serif; padding: 20px;">
+    <h1>Đăng nhập</h1>
+    <% if (typeof error !== 'undefined' && error) { %>
+        <p style="color: red;"><%= error %></p>
+    <% } %>
+    <% if (typeof message !== 'undefined' && message) { %>
+        <p style="color: green;"><%= message %></p>
+    <% } %>
+    <form action="/login" method="POST">
+        <input type="text" name="username" placeholder="Nhập username..." required style="padding: 8px; margin-right: 8px;" />
+        <button type="submit" style="padding: 8px 16px; cursor: pointer;">Login</button>
+    </form>
+    <p><a href="/">Quay lại trang chủ</a></p>
+</body>
+</html>

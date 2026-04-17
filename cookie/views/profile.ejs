@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang cá nhân</title>
+</head>
+<body style="font-family: sans-serif; padding: 20px;">
+    <h1>Trang cá nhân</h1>
+    <p><strong>Username:</strong> <%= username %></p>
+    <p><strong>Thời điểm đăng nhập:</strong> <%= loginTime %></p>
+    <p><strong>Số lần truy cập <code>/profile</code> trong phiên này:</strong> <span style="font-size: 1.5em; color: darkorange;"><%= viewCount %></span></p>
+    <hr/>
+    <p>
+        <a href="/">Trang chủ</a> | <a href="/logout">Đăng xuất</a>
+    </p>
+</body>
+</html>
